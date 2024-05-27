@@ -1,11 +1,3 @@
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-
-#include "focal.h"
-#include "hdf5.h"
-#include "grid_io.h"
 
 int writeTimetraces2ascii( int dim0, int dim1, int t_end, double period, 
                            char filename[], double timetraces[dim0][dim1] ) {

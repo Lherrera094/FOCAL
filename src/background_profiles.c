@@ -1,11 +1,3 @@
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "focal.h"
-#include "background_profiles.h"
-#include "hdf5.h"
-#include "grid_io.h"
 
 int make_density_profile( gridConfiguration *gridCfg, 
                           double cntrl_para, 

@@ -297,13 +297,10 @@ int main( int argc, char *argv[] ) {
     printf( "...done defining background plasma density\n" );
 
     printf( "starting defining background magnetic field...\n" );
-    // B0x: even-odd-odd
-    // B0y: odd-even-odd
-    // B0z: odd-odd-even
-            // B0_profile: 1 = constant field
+    // B0_profile: 1 = constant field
     make_B0_profile(
             &gridCfg,
-            // cntrl_para: B0_profile=1 --> value of Y
+            // cntrl_para: B0_profile=1 --> value of X
             .85, 
             J_B0 );
     printf( "...done defining background magnetic field\n" );
