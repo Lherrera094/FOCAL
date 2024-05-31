@@ -1,6 +1,9 @@
 #ifndef POWER_CALC_H
 #define POWER_CALC_H
 
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 #include "focal.h"
 
 double calc_poynt_4( gridConfiguration *gridCfg, 

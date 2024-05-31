@@ -6,7 +6,6 @@
 #include <stdlib.h>
 
 #include "focal.h"
-#include "background_profiles.h"
 #include "hdf5.h"
 #include "grid_io.h"
 

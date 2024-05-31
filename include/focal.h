@@ -6,6 +6,10 @@
     #define M_PI 3.14159265358979323846
 #endif
 
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define ABSORBER_DAMPING(eco,damp) (1.-eco*damp*damp)
 
 // define structures
