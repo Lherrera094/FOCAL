@@ -1,7 +1,3 @@
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "focal.h"
 
 int advance_J( gridConfiguration *gridCfg, 
@@ -38,21 +34,21 @@ int advance_J( gridConfiguration *gridCfg,
                         pow(2*M_PI,2) * n_e[(ii/2)][(jj/2)][(kk/2)] * EB_WAVE[ii+1][jj  ][kk  ]
                         - 2*M_PI * ( J_B0[ii  ][jj+1][kk  ]*J_B0[ii+1][jj+1][kk  ]        // +Jy*B0z
                                     -J_B0[ii  ][jj  ][kk+1]*J_B0[ii+1][jj  ][kk+1]        // -Jz*B0y
-                              )
+                                   )
                         );
                 // Jy: even-odd-even
                 J_B0[ii  ][jj+1][kk  ]    += + gridCfg->dt*(
                         pow(2*M_PI,2) * n_e[(ii/2)][(jj/2)][(kk/2)] * EB_WAVE[ii  ][jj+1][kk  ]
                         -2*M_PI * (-J_B0[ii+1][jj  ][kk  ]*J_B0[ii+1][jj+1][kk  ]         // -Jx*B0z
                                    +J_B0[ii  ][jj  ][kk+1]*J_B0[ii  ][jj+1][kk+1]         // +Jz*B0x
-                              )
+                                  )
                         );
                 // Jz: even-even-odd
                 J_B0[ii  ][jj  ][kk+1]    += + gridCfg->dt*(
                         pow(2*M_PI,2) * n_e[(ii/2)][(jj/2)][(kk/2)] * EB_WAVE[ii  ][jj  ][kk+1]
                         -2*M_PI * ( J_B0[ii+1][jj  ][kk  ]*J_B0[ii+1][jj  ][kk+1]        // +Jx*B0y
                                    -J_B0[ii  ][jj+1][kk  ]*J_B0[ii  ][jj+1][kk+1]        // -Jy*B0x
-                              )
+                                  )
                         );
             }
         }

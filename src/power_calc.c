@@ -1,7 +1,3 @@
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "power_calc.h"
 
 double calc_poynt_4( gridConfiguration *gridCfg, 

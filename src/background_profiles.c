@@ -1,3 +1,4 @@
+#include "background_profiles.h"
 
 int make_density_profile( gridConfiguration *gridCfg, 
                           double cntrl_para, 
