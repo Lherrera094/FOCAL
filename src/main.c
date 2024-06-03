@@ -619,8 +619,6 @@ int main( int argc, char *argv[] ) {
     printf("FOCAL Running time: %.2e s.\n", cpu_time_used);
     
     return EXIT_SUCCESS;
-
-    
 }//}}}
 
 
