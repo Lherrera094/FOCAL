@@ -25,6 +25,7 @@
 #include <getopt.h>
 #include <sys/stat.h>
 #include <stdbool.h>
+#include <time.h>
 
 
 // check if compiler understands OMP, if not, this file does probably not exist
@@ -59,6 +60,10 @@
 
 int main( int argc, char *argv[] ) {
 //{{{
+
+    clock_t start, end;
+    double cpu_time_used;
+    start = clock();
 
     struct gridConfiguration gridCfg;
     struct beamConfiguration beamCfg;
@@ -112,7 +117,7 @@ int main( int argc, char *argv[] ) {
         omega_t;
 
     char
-        dSet_name[PATH_MAX],
+        dSet_name[PATH_MAX],                //name of the saved variables in the hdf5 
         filename_hdf5[PATH_MAX];            // filename of hdf5 file for output
 
     bool
@@ -134,7 +139,7 @@ int main( int argc, char *argv[] ) {
     gridCfg.t_end   = (int)((100-50)*gridCfg.period);
 
     gridCfg.B0_profile  = 0;
-    gridCfg.ne_profile  = 2+3;
+    gridCfg.ne_profile  = 3;
 
     // arrays realized as variable-length array (VLA)
     // E- and B-wavefield
@@ -608,7 +613,14 @@ int main( int argc, char *argv[] ) {
     printf( "freed n_e\n" );
     free( data2save );
     printf( "freed data2save\n" );
+
+    end = clock(); 
+    cpu_time_used = ( (double)(end - start) )/CLOCKS_PER_SEC;
+    printf("FOCAL Running time: %.2e s.\n", cpu_time_used);
+    
     return EXIT_SUCCESS;
+
+    
 }//}}}
 
 
