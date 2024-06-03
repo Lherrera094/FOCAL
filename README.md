@@ -1,2 +1,2 @@
 # FOCAL
-Adaptation of FOCAL code for plasma wakefield accelerators
+Finite Diference-Time Domaine code to propagation of electromagnetic waves in cold magnetized plasmas.
