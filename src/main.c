@@ -15,33 +15,13 @@
  *
  **/
 
-#include <limits.h>
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-#include <strings.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <getopt.h>
-#include <sys/stat.h>
-#include <stdbool.h>
-#include <time.h>
-
-
-// check if compiler understands OMP, if not, this file does probably not exist
-#ifdef _OPENMP
-    #include <omp.h>  
-#endif
-
-#define HDF5
-#ifdef HDF5
-    #include "hdf5.h"
-#endif
-
-#ifndef M_PI
-  #define M_PI 3.14159265358979323846
-#endif
-
+#include "macros.h"
+#include "focal.h"
+#include "antenna.h"
+#include "grid_io.h"
+#include "boundaries.h"
+#include "background_profiles.h"
+#include "power_calc.h"
 
 // setting boundary conditions, possible choices are
 // 1: simple_abc
@@ -50,17 +30,9 @@
 
 #define DETECTOR_ANTENNA_1D
 
-
-#include "focal.h"
-#include "antenna.h"
-#include "grid_io.h"
-#include "background_profiles.h"
-#include "power_calc.h"
-
-
 int main( int argc, char *argv[] ) {
 //{{{
-
+    //Initialize running time
     clock_t start, end;
     double cpu_time_used;
     start = clock();
@@ -138,7 +110,7 @@ int main( int argc, char *argv[] ) {
     gridCfg.Nz_ref  = 2*gridCfg.d_absorb + (int)gridCfg.period;
     gridCfg.t_end   = (int)((100-50)*gridCfg.period);
 
-    gridCfg.B0_profile  = 0;
+    gridCfg.B0_profile  = 1;
     gridCfg.ne_profile  = 3;
 
     // arrays realized as variable-length array (VLA)
@@ -616,7 +588,7 @@ int main( int argc, char *argv[] ) {
 
     end = clock(); 
     cpu_time_used = ( (double)(end - start) )/CLOCKS_PER_SEC;
-    printf("FOCAL Running time: %.2e s.\n", cpu_time_used);
+    printf("Running time: %.2e s.\n", cpu_time_used);
     
     return EXIT_SUCCESS;
 }//}}}
