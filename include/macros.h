@@ -29,6 +29,11 @@
   #define M_PI 3.14159265358979323846
 #endif
 
+// setting boundary conditions, possible choices are
+// 1: simple_abc
+// 2: Mur
+#define BOUNDARY 1
 
+#define DETECTOR_ANTENNA_1D
 
 #endif
