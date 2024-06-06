@@ -2,7 +2,6 @@
 
 int set2zero_1D( size_t N_x, double arr_1D[N_x] ){
 //{{{
-
     size_t
         ii;
 
@@ -10,14 +9,12 @@ int set2zero_1D( size_t N_x, double arr_1D[N_x] ){
     for (ii=0 ; ii<N_x ; ++ii) {
         arr_1D[ii] = .0;
     }
-
     return EXIT_SUCCESS;
 } //}}}
 
 
 int set2zero_3D( size_t N_x, size_t N_y, size_t N_z, double arr_3D[N_x][N_y][N_z] ){
 //{{{
-
     size_t
         ii, jj, kk;
 
@@ -29,11 +26,10 @@ int set2zero_3D( size_t N_x, size_t N_y, size_t N_z, double arr_3D[N_x][N_y][N_z
             }
         }
     }
-
     return EXIT_SUCCESS;
 } //}}}
 
-void gridInit(gridConfiguration *gridCfg, int boundary){
+void gridConfInit(gridConfiguration *gridCfg, int boundary){
 
     int scale;
 
@@ -63,5 +59,25 @@ void gridInit(gridConfiguration *gridCfg, int boundary){
     // in the equations we have to use period/2 for the wavelength.
     gridCfg->dx  = 1./(gridCfg->period/2);
     gridCfg->dt  = 1./(2.*(gridCfg->period/2));
+}
+
+void antenaInit(gridConfiguration *gridCfg, beamConfiguration *beamCfg){
+
+    // default values to be used if input parameter are not set
+    beamCfg.antAngle_zx     = 0;
+    beamCfg.antAngle_zy     = 0;
+
+    beamCfg->exc_signal  = 5;//3;//4;
+    beamCfg->rampUpMethod= 1;
+    beamCfg->ant_x       = gridCfg->d_absorb + 8*gridCfg->period;//gridCfg.Nx/2;
+    beamCfg->ant_y       = gridCfg->Ny/2;
+    beamCfg->ant_z       = gridCfg->d_absorb + 4;
+    // positions have to be even numbers, to ensure fields are accessed correctly
+    if ((beamCfg->ant_x % 2) != 0)  ++beamCfg->ant_x;
+    if ((beamCfg->ant_y % 2) != 0)  ++beamCfg->ant_y;
+    if ((beamCfg->ant_z % 2) != 0)  ++beamCfg->ant_z;
+    beamCfg->ant_w0x     = 2;
+    beamCfg->ant_w0y     = 2;
+    beamCfg->z2waist     = -(298.87)*.0;                // .2/l_0*period = -298.87
 
 }
