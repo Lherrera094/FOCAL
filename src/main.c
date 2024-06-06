@@ -16,19 +16,13 @@
  **/
 
 #include "macros.h"
+#include "initialize_grid.h"
 #include "focal.h"
 #include "antenna.h"
 #include "grid_io.h"
 #include "boundaries.h"
 #include "background_profiles.h"
 #include "power_calc.h"
-
-// setting boundary conditions, possible choices are
-// 1: simple_abc
-// 2: Mur
-#define BOUNDARY 1
-
-#define DETECTOR_ANTENNA_1D
 
 int main( int argc, char *argv[] ) {
 //{{{
@@ -43,8 +37,6 @@ int main( int argc, char *argv[] ) {
     int
         ii,jj,kk,
         t_int, T_wave, 
-
-        scale,
 
 #ifdef _OPENMP
         n_threads,                          // number of threads that will be used (OpenMP)
@@ -96,22 +88,8 @@ int main( int argc, char *argv[] ) {
         angle_zx_set,                       // is antAngle_zx set during call ?
         angle_zy_set;                       // is antAngle_zy set during call ?
 
-    // set-up grid
-    scale           = 1;
-    gridCfg.period  = 16*scale;
-#if BOUNDARY == 1
-    gridCfg.d_absorb= (int)(3*gridCfg.period);
-#elif BOUNDARY == 2
-    gridCfg.d_absorb= 8;
-#endif
-    gridCfg.Nx  = (400+0*200)*scale;
-    gridCfg.Ny  = (300+0*100)*scale;
-    gridCfg.Nz  = (200+0*150)*scale;
-    gridCfg.Nz_ref  = 2*gridCfg.d_absorb + (int)gridCfg.period;
-    gridCfg.t_end   = (int)((100-50)*gridCfg.period);
-
-    gridCfg.B0_profile  = 1;
-    gridCfg.ne_profile  = 3;
+    
+    gridInit( &gridCfg, 1);
 
     // arrays realized as variable-length array (VLA)
     // E- and B-wavefield
@@ -129,7 +107,7 @@ int main( int argc, char *argv[] ) {
     double (*antPhaseTerms)[gridCfg.Ny/2]               = calloc(gridCfg.Nx/2, sizeof *antPhaseTerms);
     // time traces
     double (*timetraces)[8]                             = calloc((gridCfg.t_end/(int)gridCfg.period), sizeof *timetraces);
-
+    
     // old E-fields required for Mur's boundary condition
 #if BOUNDARY == 2
     double (*E_Xdir_OLD)[gridCfg.Ny][gridCfg.Nz]        = calloc(8,  sizeof *E_Xdir_OLD);
@@ -213,14 +191,7 @@ int main( int argc, char *argv[] ) {
     }
 #endif
 
-    // dt/dx = 0.5 is commenly used in 2D FDTD codes
-    // Note that period refers to the wavelength in the numerical grid and not
-    // in the "physical" grid (where one grid cell is equal to one Yee cell).
-    // This means that in the physical grid, the wavelength is period/2, thus
-    // in the equations we have to use period/2 for the wavelength.
-    gridCfg.dx  = 1./(gridCfg.period/2);
-    gridCfg.dt  = 1./(2.*(gridCfg.period/2));
-        
+
 #if BOUNDARY == 1
     eco         = 10./(double)(gridCfg.period);
 #endif
@@ -244,6 +215,7 @@ int main( int argc, char *argv[] ) {
     poynt_z1       = .0;
     poynt_z1_ref   = .0;
     poynt_z2       = .0;
+    
     /*
     power_EE_x1    = .0;
     power_EE_x2    = .0;
@@ -592,5 +564,3 @@ int main( int argc, char *argv[] ) {
     
     return EXIT_SUCCESS;
 }//}}}
-
-
