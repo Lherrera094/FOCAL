@@ -81,3 +81,8 @@ void antenaInit(gridConfiguration *gridCfg, beamConfiguration *beamCfg){
     beamCfg->z2waist     = -(298.87)*.0;                // .2/l_0*period = -298.87
 
 }
+
+void gridInit(gridConfiguration *gridCfg, Grid *g){
+
+    double (*EB_WAVE)[gridCfg->Ny][gridCfg->Nz]           = calloc(gridCfg->Nx, sizeof *EB_WAVE);
+}

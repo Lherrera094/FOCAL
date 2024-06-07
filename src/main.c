@@ -17,6 +17,7 @@
 
 #include "macros.h"
 #include "focal-grid.h"
+#include "focal-alloc.h"
 
 #include "initialize_grid.h"
 #include "focal.h"
@@ -36,6 +37,9 @@ int main( int argc, char *argv[] ) {
 
     struct gridConfiguration gridCfg;
     struct beamConfiguration beamCfg;
+    //struct Grid g;
+
+    //ALLOC_3D(g, 1, Grid);
 
     int
         ii,jj,kk,
@@ -94,6 +98,7 @@ int main( int argc, char *argv[] ) {
     int boundary = 1;
 
     gridConfInit( &gridCfg, boundary);      //Initialize grid configuration values
+    //gridInit( &gridCfg, &g);
 
     // arrays realized as variable-length array (VLA)
     // E- and B-wavefield
