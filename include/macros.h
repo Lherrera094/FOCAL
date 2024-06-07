@@ -36,4 +36,16 @@
 
 #define DETECTOR_ANTENNA_1D
 
+/*Define macros for the grid configuration*/
+/*#define NxG(gridCfg)        gridCfg->Nx
+#define NyG(gridCfg)        gridCfg->Ny
+#define NzG(gridCfg)        gridCfg->Nz
+
+#define Nx                  NxG(gridCfg)
+#define Ny                  NyG(gridCfg)
+#define Nz                  NzG(gridCfg)
+*/
+
+/*Define macros for the beam configuration grid*/
+
 #endif
