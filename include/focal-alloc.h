@@ -10,3 +10,5 @@
                 "Allocation failed for " #PNTR ". Terminating...\n");   \
         exit(-1);                                                       \
     }
+
+#endif

@@ -16,9 +16,9 @@ typedef struct gridConfiguration {
 } gridConfiguration;
 
 typedef struct Grid {
-    double *EB_WAVE, *EB_WAVE_REF,
+    double *EB_WAVE; /**EB_WAVE_REF,
            *J_B0, n_e; 
-           /*data2save, 
+           data2save, 
            *antField_xy, *antPhaseTerms,
            *timetraces;*/
 } Grid;
