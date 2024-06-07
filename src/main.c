@@ -16,6 +16,8 @@
  **/
 
 #include "macros.h"
+#include "focal-grid.h"
+
 #include "initialize_grid.h"
 #include "focal.h"
 #include "antenna.h"
@@ -23,6 +25,7 @@
 #include "boundaries.h"
 #include "background_profiles.h"
 #include "power_calc.h"
+
 
 int main( int argc, char *argv[] ) {
 //{{{
@@ -266,7 +269,7 @@ int main( int argc, char *argv[] ) {
     }
 #endif
 
-
+    /*System's time evolution*/
     for (t_int=0 ; t_int <=gridCfg.t_end ; ++t_int) {
         
         omega_t += 2.*M_PI/gridCfg.period;

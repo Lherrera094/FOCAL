@@ -64,8 +64,8 @@ void gridConfInit(gridConfiguration *gridCfg, int boundary){
 void antenaInit(gridConfiguration *gridCfg, beamConfiguration *beamCfg){
 
     // default values to be used if input parameter are not set
-    beamCfg.antAngle_zx     = 0;
-    beamCfg.antAngle_zy     = 0;
+    beamCfg->antAngle_zx     = 0;
+    beamCfg->antAngle_zy     = 0;
 
     beamCfg->exc_signal  = 5;//3;//4;
     beamCfg->rampUpMethod= 1;
