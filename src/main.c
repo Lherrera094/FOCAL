@@ -35,11 +35,9 @@ int main( int argc, char *argv[] ) {
     clock_t start, end;
     double cpu_time_used;
     start = clock();
-    
 
     struct gridConfiguration gridCfg;
     struct beamConfiguration beamCfg;
-    //struct Grid g;
 
     int
         ii,jj,kk,
@@ -101,12 +99,6 @@ int main( int argc, char *argv[] ) {
 
     gridConfInit( &gridCfg, boundary);      //Initialize grid configuration values
 
-    /*
-    const char* foldername = "Prueba_1"; 
-    const char* path = "../Simulations";
-    const char* filename_h5 = "fileout.h5";
-    char fullDir[2024];
-    */
     /*Folder creation for results storage.*/
     create_folder_path( &gridCfg);
     

@@ -10,6 +10,7 @@
 
 void simulation_folder(const char *path);
 void data_folder(const char *path, const char *foldername);
+void copyJSON(const char *path, const char *foldername);
 void create_folder_path(gridConfiguration *gridCfg);
 
 #endif

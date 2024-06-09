@@ -44,18 +44,14 @@ void data_folder(const char *path, const char *foldername){
     }
 }
 
+void copyJSON(const char *path, const char *foldername){
+    printf("Copy JSON");
+}
+
 void create_folder_path(gridConfiguration *gridCfg){
 
     simulation_folder(gridCfg->path);
     data_folder(gridCfg->path, gridCfg->foldername);
     
-    //snprintf(newPath, sizeof(newPath), "%s/%s", path,foldername);
-
-    // Create the full directory path and check for buffer overflow
-    /*if (snprintf(fullPath, sizeof(fullPath), "%s/%s", path, foldername) >= sizeof(fullPath)) {
-        fprintf(stderr, "Error: Directory path is too long.\n");
-        return;
-    }*/
-
-    //return *newPath;
 }
+

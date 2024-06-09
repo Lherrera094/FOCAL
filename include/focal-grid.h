@@ -22,8 +22,7 @@ typedef struct Grid {
            *J_B0, n_e; 
            data2save, 
            *antField_xy, *antPhaseTerms,
-           *timetraces;*/
-    
+           */
 } Grid;
 
 typedef struct beamConfiguration {

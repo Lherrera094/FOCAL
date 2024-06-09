@@ -59,9 +59,9 @@ void gridConfInit(gridConfiguration *gridCfg, int boundary){
     // in the equations we have to use period/2 for the wavelength.
     gridCfg->dx  = 1./(gridCfg->period/2);
     gridCfg->dt  = 1./(2.*(gridCfg->period/2));
-
-    gridCfg->foldername             = "Prueba_final"; 
+    
     gridCfg->path                   = "../Simulations";
+    gridCfg->foldername             = "Prueba_final"; 
     gridCfg->filename_h5            = "fileout.h5";
     gridCfg->filename_timetraces    = "timetraces2.dat";
 }
