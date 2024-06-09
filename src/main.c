@@ -19,6 +19,7 @@
 #include "focal-grid.h"
 #include "focal-alloc.h"
 
+#include "save_data.h"
 #include "initialize_grid.h"
 #include "focal.h"
 #include "antenna.h"
@@ -34,12 +35,11 @@ int main( int argc, char *argv[] ) {
     clock_t start, end;
     double cpu_time_used;
     start = clock();
+    
 
     struct gridConfiguration gridCfg;
     struct beamConfiguration beamCfg;
     //struct Grid g;
-
-    //ALLOC_3D(g, 1, Grid);
 
     int
         ii,jj,kk,
@@ -89,7 +89,9 @@ int main( int argc, char *argv[] ) {
 
     char
         dSet_name[PATH_MAX],                //name of the saved variables in the hdf5 
-        filename_hdf5[PATH_MAX];            // filename of hdf5 file for output
+        filename_hdf5[PATH_MAX],            // filename of hdf5 file for output
+        filename_timetrazes[PATH_MAX],
+        fullDir[2024];
 
     bool
         angle_zx_set,                       // is antAngle_zx set during call ?
@@ -98,6 +100,20 @@ int main( int argc, char *argv[] ) {
     int boundary = 1;
 
     gridConfInit( &gridCfg, boundary);      //Initialize grid configuration values
+
+    /*
+    const char* foldername = "Prueba_1"; 
+    const char* path = "../Simulations";
+    const char* filename_h5 = "fileout.h5";
+    char fullDir[2024];
+    */
+    /*Folder creation for results storage.*/
+    create_folder_path( &gridCfg);
+    
+    if (snprintf(fullDir, sizeof(fullDir),"%s/%s", gridCfg.path, gridCfg.foldername) >= sizeof(fullDir)) {
+        fprintf(stderr, "Error: Directory path is too long.\n");
+        return -1;
+    }
     //gridInit( &gridCfg, &g);
 
     // arrays realized as variable-length array (VLA)
@@ -455,9 +471,10 @@ int main( int argc, char *argv[] ) {
     printf( "-------------------------------------------------------------------------------------------------------------\n" );
 
     // write timetrace data into file
-    // open file in w(rite) mode; might consider using a+ instead
+    // open file in w(rite) mode; might consider using a+ instead    
+    snprintf( filename_timetrazes, sizeof(filename_timetrazes), "%s/%s", fullDir, gridCfg.filename_timetraces);
     writeTimetraces2ascii( (gridCfg.t_end/(int)gridCfg.period), 8, gridCfg.t_end, gridCfg.period, 
-                           "timetraces2.dat", timetraces );
+                           filename_timetrazes, timetraces );
 
     // save into hdf5
     // abs(E)
@@ -473,7 +490,7 @@ int main( int argc, char *argv[] ) {
             }
         }
     }
-    len_str = snprintf( filename_hdf5, sizeof(filename_hdf5), "fileout.h5");
+    len_str = snprintf( filename_hdf5, sizeof(filename_hdf5), "%s/%s", fullDir, gridCfg.filename_h5);
     if ( (len_str < 0) || (len_str >= sizeof(filename_hdf5)) ) {
         printf( "ERROR: could not write filename_hdf5 string\n" );  // use a proper error handler here
     } else {
