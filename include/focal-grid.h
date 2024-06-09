@@ -13,6 +13,8 @@ typedef struct gridConfiguration {
     double
         period,
         dx,dt;
+    const char  *foldername, *path, *filename_h5, 
+                *filename_timetraces;    
 } gridConfiguration;
 
 typedef struct Grid {
@@ -21,6 +23,7 @@ typedef struct Grid {
            data2save, 
            *antField_xy, *antPhaseTerms,
            *timetraces;*/
+    
 } Grid;
 
 typedef struct beamConfiguration {
