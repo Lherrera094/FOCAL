@@ -27,6 +27,7 @@
 #include "boundaries.h"
 #include "background_profiles.h"
 #include "power_calc.h"
+#include "cJSON.h"
 
 
 int main( int argc, char *argv[] ) {

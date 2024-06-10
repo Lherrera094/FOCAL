@@ -1,36 +1,18 @@
 {	
-    "Code": "0001-17MAR22-KIA&YAR-IP",
-    "Analisis": 1,
-    "Tipo de Colision": 2,
-    "Carro 1":
+    "Main_Project": "../Simulations",
+    "foldername":   "Prueba_final",
+    "filename_hdf5": "fileout.h5",
+    "filename_timetraces": "timetraces2.dat",
+    "Grid_Configuration":
     {
         "Marca": "Toyota",
         "Modelo": "Yaris",
         "Año": 2008,
         "Zona de Impacto": 3,
         "Longitud de Abolladura(m)": 0.628,
-        "Numero de Coeficientes": 6 ,
-        "Coeficientes":
-    	{
-            "C1": 0.0,
-    	    "C2": 0.05,
-    	    "C3": 0.10,
-    	    "C4": 0.15,
-    	    "C5": 0.19,
-    	    "C6": 0.24
-    	},
-    	"Longitud del Auto(m)": 3.681,
-        "Ancho del Auto(m)": 1.69,
-        "Distancia h": 0.60,
-        "Numero de Pasajeros": 2,
-        "Masa de Pasajeros(Kg)": 
-    	{
-    	    "Mass 1": 75,
-    	    "Mass 2": 75,
-    	},
-        "Distance a Referencia(cm)": 16 
+        "Numero de Coeficientes": 6
     },
-    "Carro 2":
+    "Antenna_Configuration":
     {
         "Marca": "KIA",
         "Modelo": "K 2700",
@@ -38,23 +20,6 @@
         "Zona de Impacto": 1,
         "Longitud de Abolladura(m)": 0.25,
         "Numero de Coeficientes": 6 ,
-        "Coeficientes":
-    	{
-            "C1": 0.0,
-    	    "C2": 0.01,
-    	    "C3": 0.01,
-    	    "C4": 0.005,
-    	    "C5": 0.005,
-    	    "C6": 0.005
-    	},
-    	"Longitud del Auto(m)": 4.825,
-        "Ancho del Auto(m)": 1.74,
-        "Distancia h": 0.60,
-        "Numero de Pasajeros": 1,
-        "Masa de Pasajeros(Kg)": 
-    	{
-    	    "Mass 1": 75,
-    	},
         "Distance a Referencia(cm)": 10 
     }
 }

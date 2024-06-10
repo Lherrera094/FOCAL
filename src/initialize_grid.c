@@ -12,7 +12,6 @@ int set2zero_1D( size_t N_x, double arr_1D[N_x] ){
     return EXIT_SUCCESS;
 } //}}}
 
-
 int set2zero_3D( size_t N_x, size_t N_y, size_t N_z, double arr_3D[N_x][N_y][N_z] ){
 //{{{
     size_t
@@ -31,10 +30,57 @@ int set2zero_3D( size_t N_x, size_t N_y, size_t N_z, double arr_3D[N_x][N_y][N_z
 
 void gridConfInit(gridConfiguration *gridCfg, int boundary){
 
-    int scale;
+    /*Read JSON and extract data*/
+    char *json_file = read_json();
 
-    // set-up grid
-    scale           = 1;
+    if(json_file == NULL){
+        printf("JSON file doesn't exists.");
+        return;
+    }
+
+    //Parse the JSON string
+    cJSON *json = cJSON_Parse(json_file);
+    if(json == NULL){
+        printf("Error at parse JSON string");
+        free(json_file);
+        return;
+    }
+
+    /*
+    //Extract data from JSON file. Save folder info
+    cJSON *Main_Project = cJSON_GetObjectItemCaseSensitive(json, "Main_Project");   //Main Project path
+    if( cJSON_IsString(Main_Project) && (Main_Project->valuestring != NULL) ){
+        gridCfg->path = strdup(Main_Project->valuestring);
+    }
+
+    cJSON *FolderName = cJSON_GetObjectItemCaseSensitive(json, "foldername");       //Simulation folder name
+    if( cJSON_IsString(FolderName) && (FolderName->valuestring != NULL) ){
+        gridCfg->foldername = strdup(FolderName->valuestring);
+    }
+
+    cJSON *Filename_HDF5 = cJSON_GetObjectItemCaseSensitive(json, "filename_hdf5");   //filename hdf5
+    if( cJSON_IsString(Filename_HDF5) && (Filename_HDF5->valuestring != NULL) ){
+        gridCfg->filename_h5 = strdup(Filename_HDF5->valuestring);
+    }
+
+    cJSON *Filename_TimeTrace = cJSON_GetObjectItemCaseSensitive(json, "filename_timetraces");   //filename hdf5
+    if( cJSON_IsString(Filename_TimeTrace) && (Filename_TimeTrace->valuestring != NULL) ){
+        gridCfg->filename_h5 = strdup(Filename_TimeTrace->valuestring);
+    }*/
+
+    //clean up
+    cJSON_Delete(json);
+    free(json_file);
+    
+    //Initialize Grid Configuration values
+    /*cJSON *input_scale = cJSON_GetObjectItemCaseSensitive(json, "scale");   //filename hdf5
+    if( cJSON_IsNumber(input_scale) ){
+        nw = input_scale->valueint;
+    }*/
+
+    //printf("%d",nw);
+
+    int scale   = 1;
     gridCfg->period  = 16*scale;
 
     if (boundary == 1){
@@ -60,10 +106,7 @@ void gridConfInit(gridConfiguration *gridCfg, int boundary){
     gridCfg->dx  = 1./(gridCfg->period/2);
     gridCfg->dt  = 1./(2.*(gridCfg->period/2));
     
-    gridCfg->path                   = "../Simulations";
-    gridCfg->foldername             = "Prueba_final"; 
-    gridCfg->filename_h5            = "fileout.h5";
-    gridCfg->filename_timetraces    = "timetraces2.dat";
+    
 }
 
 void antenaInit(gridConfiguration *gridCfg, beamConfiguration *beamCfg){
@@ -90,15 +133,36 @@ void antenaInit(gridConfiguration *gridCfg, beamConfiguration *beamCfg){
 void gridInit(gridConfiguration *gridCfg, Grid *g){
 
     double (*EB_WAVE)[gridCfg->Ny][gridCfg->Nz]           = calloc(gridCfg->Nx, sizeof *EB_WAVE);
+
+
 }
 
 char *read_json(){
 
     FILE *file = fopen("../input_FOCAL.json", "rb");
     if (file == NULL) {
-        perror("Cannot open file");
+        perror("Error openning file.");
         return NULL;
     }
 
-    
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char *json_data = (char *)malloc(length + 1);
+    if (json_data == NULL) {
+        perror("Error at allocating memory");
+        fclose(file);
+        return NULL;
+    }
+
+    fread(json_data, 1, length, file);
+    json_data[length] = '\0';
+
+    fclose(file);
+    return json_data;
+
 }
+
+
+

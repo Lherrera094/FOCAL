@@ -9,6 +9,7 @@ typedef struct gridConfiguration {
         Nz_ref,
         d_absorb,
         t_end,
+        scale,
         ne_profile, B0_profile;
     double
         period,

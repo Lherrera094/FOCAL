@@ -76,7 +76,7 @@ void copyJSON(const char *path, const char *foldername){
     fclose(srcFile);
     fclose(destFile);
 
-    printf("JSON file saved successfully.\n");
+    printf("JSON file saved.\n");
 }
 
 void create_folder_path(gridConfiguration *gridCfg){
