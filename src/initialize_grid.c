@@ -32,7 +32,7 @@ void gridConfInit(gridConfiguration *gridCfg, int boundary){
 
     /*Read JSON and extract data*/
     char *json_file = read_json();
-
+    
     if(json_file == NULL){
         printf("JSON file doesn't exists.");
         return;
@@ -46,7 +46,6 @@ void gridConfInit(gridConfiguration *gridCfg, int boundary){
         return;
     }
 
-    /*
     //Extract data from JSON file. Save folder info
     cJSON *Main_Project = cJSON_GetObjectItemCaseSensitive(json, "Main_Project");   //Main Project path
     if( cJSON_IsString(Main_Project) && (Main_Project->valuestring != NULL) ){
@@ -63,35 +62,36 @@ void gridConfInit(gridConfiguration *gridCfg, int boundary){
         gridCfg->filename_h5 = strdup(Filename_HDF5->valuestring);
     }
 
-    cJSON *Filename_TimeTrace = cJSON_GetObjectItemCaseSensitive(json, "filename_timetraces");   //filename hdf5
+    cJSON *Filename_TimeTrace = cJSON_GetObjectItemCaseSensitive(json, "filename_timetraces");   //filename datatraces
     if( cJSON_IsString(Filename_TimeTrace) && (Filename_TimeTrace->valuestring != NULL) ){
-        gridCfg->filename_h5 = strdup(Filename_TimeTrace->valuestring);
-    }*/
+        gridCfg->filename_timetraces = strdup(Filename_TimeTrace->valuestring);
+    }
+    
+    //Initialize Grid Configuration values
+    cJSON *item_scale = cJSON_GetObjectItemCaseSensitive(json, "scale");   //scale factor
+    if( cJSON_IsNumber(item_scale) ){
+        gridCfg->scale = item_scale->valueint;
+    }
+
+    cJSON *item_period = cJSON_GetObjectItemCaseSensitive(json, "period");   //wave period
+    if( cJSON_IsNumber(item_period) ){
+        gridCfg->period = item_period->valuedouble;
+        gridCfg->period = gridCfg->period * gridCfg->scale;
+    }
 
     //clean up
     cJSON_Delete(json);
     free(json_file);
-    
-    //Initialize Grid Configuration values
-    /*cJSON *input_scale = cJSON_GetObjectItemCaseSensitive(json, "scale");   //filename hdf5
-    if( cJSON_IsNumber(input_scale) ){
-        nw = input_scale->valueint;
-    }*/
-
-    //printf("%d",nw);
-
-    int scale   = 1;
-    gridCfg->period  = 16*scale;
 
     if (boundary == 1){
-        gridCfg->d_absorb= (int)(3*gridCfg->period);
+        gridCfg->d_absorb = (int)(3*gridCfg->period);
     }else if (boundary ==2){
-        gridCfg->d_absorb= 8;
+        gridCfg->d_absorb = 8;
     }
      
-    gridCfg->Nx  = (400+0*200)*scale;
-    gridCfg->Ny  = (300+0*100)*scale;
-    gridCfg->Nz  = (200+0*150)*scale;
+    gridCfg->Nx  = (400+0*200)*gridCfg->scale;
+    gridCfg->Ny  = (300+0*100)*gridCfg->scale;
+    gridCfg->Nz  = (200+0*150)*gridCfg->scale;
     gridCfg->Nz_ref  = 2*gridCfg->d_absorb + (int)gridCfg->period;
     gridCfg->t_end   = (int)((100-50)*gridCfg->period);
 
@@ -105,7 +105,6 @@ void gridConfInit(gridConfiguration *gridCfg, int boundary){
     // in the equations we have to use period/2 for the wavelength.
     gridCfg->dx  = 1./(gridCfg->period/2);
     gridCfg->dt  = 1./(2.*(gridCfg->period/2));
-    
     
 }
 
