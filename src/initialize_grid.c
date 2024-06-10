@@ -91,3 +91,14 @@ void gridInit(gridConfiguration *gridCfg, Grid *g){
 
     double (*EB_WAVE)[gridCfg->Ny][gridCfg->Nz]           = calloc(gridCfg->Nx, sizeof *EB_WAVE);
 }
+
+char *read_json(){
+
+    FILE *file = fopen("../input_FOCAL.json", "rb");
+    if (file == NULL) {
+        perror("Cannot open file");
+        return NULL;
+    }
+
+    
+}
