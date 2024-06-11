@@ -15,5 +15,6 @@ void gridConfInit(gridConfiguration *gridCfg, int boundary);
 void antenaInit(gridConfiguration *gridCfg, beamConfiguration *beamCfg);
 void gridInit(gridConfiguration *gridCfg, Grid *G);
 char *read_json();
+void save_json_data(gridConfiguration *gridCfg);
 
 #endif

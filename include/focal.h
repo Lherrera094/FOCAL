@@ -8,13 +8,6 @@
 #include "initialize_grid.h"
 #include "macros.h"
 
-/*
-int advance_J( gridConfiguration *gridCfg, 
-               double EB_WAVE[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz], 
-               double J_B0[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz],
-               double n_e[gridCfg->Nx/2][gridCfg->Ny/2][gridCfg->Nz/2] ); 
-*/
-
 int advance_J( gridConfiguration *gridCfg, 
                double EB_WAVE[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz], 
                double J_B0[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz],

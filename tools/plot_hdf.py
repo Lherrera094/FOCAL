@@ -130,7 +130,7 @@ def main():
     # add optional arguments
     parser.add_argument( "-f", "--filename", type=str, default="fileout.h5",
                          help="Filename of hdf5 output file from FOCAL." )
-    parser.add_argument( "-d", "--dSet_name", type=str, default="E_abs__tint00801",
+    parser.add_argument( "-d", "--dSet_name", type=str, default="n_e",
                          help="Dataset name to be plotted." )
     parser.add_argument( "-c", "--contLevels", type=int, default=20,
                          help="Number of contour levels used." )

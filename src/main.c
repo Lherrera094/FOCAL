@@ -88,7 +88,7 @@ int main( int argc, char *argv[] ) {
 
     char
         dSet_name[PATH_MAX],                //name of the saved variables in the hdf5 
-        filename_hdf5[PATH_MAX],            // filename of hdf5 file for output
+        filename_hf5[PATH_MAX],            // filename of hdf5 file for output
         filename_timetrazes[PATH_MAX],
         fullDir[2024];
 
@@ -98,16 +98,15 @@ int main( int argc, char *argv[] ) {
 
     int boundary = 1;
 
+    //Initialize grids and folders
     gridConfInit( &gridCfg, boundary);      //Initialize grid configuration values
-
-    /*Folder creation for results storage.*/
-    create_folder_path( &gridCfg);
+    antenaInit( &gridCfg, &beamCfg);
+    create_folder_path( &gridCfg);          /*Folder creation for results storage.*/
     
     if (snprintf(fullDir, sizeof(fullDir),"%s/%s", gridCfg.path, gridCfg.foldername) >= sizeof(fullDir)) {
         fprintf(stderr, "Error: Directory path is too long.\n");
         return -1;
     }
-    //gridInit( &gridCfg, &g);
 
     // arrays realized as variable-length array (VLA)
     // E- and B-wavefield
@@ -147,8 +146,6 @@ int main( int argc, char *argv[] ) {
     double (*detAnt_03_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_03_fields);
     double (*detAnt_04_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_04_fields);
 #endif
-
-    antenaInit( &gridCfg, &beamCfg);
     
     // reading input parameter
     // used for checking if input parameter was provided
@@ -267,7 +264,8 @@ int main( int argc, char *argv[] ) {
     printf( "antAngle_zx = %.2f, antAngle_zy = %.2f\n", beamCfg.antAngle_zx, beamCfg.antAngle_zy );
     printf( "ant_w0x = %.2f, ant_w0y = %.2f\n", beamCfg.ant_w0x, beamCfg.ant_w0y ); 
     printf( "ant_x = %d, ant_y = %d, ant_z = %d\n", beamCfg.ant_x, beamCfg.ant_y, beamCfg.ant_z );
-    printf( "Boundary condition set to '%d'\n", BOUNDARY );
+    printf( "Boundary condition set to '%d'\n", boundary );
+
 #ifdef DETECTOR_ANTENNA_1D
     printf( "detector antenna positions: z1 = %d, y1 = %d\n", detAnt_01_zpos, detAnt_01_ypos );
     printf( "detector antenna positions: z2 = %d, y1 = %d\n", detAnt_02_zpos, detAnt_01_ypos );
@@ -385,7 +383,6 @@ int main( int argc, char *argv[] ) {
             // y1-plane and y2-plane
             poynt_y1        = calc_poynt_4( &gridCfg, pwr_dect, "y1", EB_WAVE, EB_WAVE_ref );
             poynt_y2        = calc_poynt_4( &gridCfg, pwr_dect, "y2", EB_WAVE, EB_WAVE_ref );
-
             
 //            printf( "t = %d, power_abs_ref = %13.5e, power_abs_z1 = %13.5e, power_abs_z2 = %13.5e, poynt_z1 = %13.5e, poynt_z2 = %13.5e\n",
 //                    t_int, power_abs_ref, power_abs_z1, power_abs_z2, poynt_z1, poynt_z2 );
@@ -397,6 +394,7 @@ int main( int argc, char *argv[] ) {
             power_abs_x2    = .99*power_abs_x2  + .01*poynt_x2;
             power_abs_y1    = .99*power_abs_y1  + .01*poynt_y1;
             power_abs_y2    = .99*power_abs_y2  + .01*poynt_y2;
+            //printf("Power abs z1: %f/poynt z1 ref: %f \n", power_abs_z1, poynt_z1_ref);
 
             /*
             // EE
@@ -450,6 +448,7 @@ int main( int argc, char *argv[] ) {
         }
     } // end of time loop
 
+
     printf( "-------------------------------------------------------------------------------------------------------------\n" );
     printf( "  T   |   poynt_z1   |   poynt_z2   |   poynt_x1   |   poynt_x2   |   poynt_y1   |   poynt_y2   |  P_out     \n" );
     printf( "------+--------------+--------------+--------------+--------------+--------------+--------------+------------\n" );
@@ -483,17 +482,17 @@ int main( int argc, char *argv[] ) {
             }
         }
     }
-    len_str = snprintf( filename_hdf5, sizeof(filename_hdf5), "%s/%s", fullDir, gridCfg.filename_h5);
-    if ( (len_str < 0) || (len_str >= sizeof(filename_hdf5)) ) {
+    len_str = snprintf( filename_hf5, sizeof(filename_hf5), "%s/%s", fullDir, gridCfg.filename_h5);
+    if ( (len_str < 0) || (len_str >= sizeof(filename_hf5)) ) {
         printf( "ERROR: could not write filename_hdf5 string\n" );  // use a proper error handler here
     } else {
         sprintf( dSet_name, "E_abs__tint%05d", t_int );
-        printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hdf5, dSet_name, data2save) ) ;
+        printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hf5, dSet_name, data2save) ) ;
     }
     set2zero_3D( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, data2save );
     // density
     sprintf( dSet_name, "n_e" );
-    printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hdf5, dSet_name, n_e) ) ;
+    printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hf5, dSet_name, n_e) ) ;
     // background magnetic field
     // B0x: even-odd-odd
 #pragma omp parallel for collapse(3) default(shared) private(ii,jj,kk)
@@ -504,7 +503,7 @@ int main( int argc, char *argv[] ) {
             }
         }
     }
-    printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hdf5, "B0x", data2save) ) ;
+    printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hf5, "B0x", data2save) ) ;
     set2zero_3D( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, data2save );
     // B0y: odd-even-odd
 #pragma omp parallel for collapse(3) default(shared) private(ii,jj,kk)
@@ -515,7 +514,7 @@ int main( int argc, char *argv[] ) {
             }
         }
     }
-    printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hdf5, "B0y", data2save) ) ;
+    printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hf5, "B0y", data2save) ) ;
     set2zero_3D( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, data2save );
     // B0z: odd-odd-even
 #pragma omp parallel for collapse(3) default(shared) private(ii,jj,kk)
@@ -526,30 +525,30 @@ int main( int argc, char *argv[] ) {
             }
         }
     }
-    printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hdf5, "B0z", data2save) ) ;
+    printf( "status of writeMyHDF_v4: %d\n", writeMyHDF_v4( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, filename_hf5, "B0z", data2save) ) ;
     set2zero_3D( gridCfg.Nx/2, gridCfg.Ny/2, gridCfg.Nz/2, data2save );
 
-    writeConfig2HDF( &gridCfg, &beamCfg, filename_hdf5 );
+    writeConfig2HDF( &gridCfg, &beamCfg, filename_hf5 );
 
 
 #if defined(HDF5) && defined(DETECTOR_ANTENNA_1D)
     if (detAnt_01_zpos < (gridCfg.Nz - gridCfg.d_absorb)) {
-        detAnt1D_write2hdf5( gridCfg.Nx, filename_hdf5, "/detAnt_01" , 
+        detAnt1D_write2hdf5( gridCfg.Nx, filename_hf5, "/detAnt_01" , 
                              detAnt_01_ypos, detAnt_01_zpos,
                              detAnt_01_fields );
     }
     if (detAnt_02_zpos < (gridCfg.Nz - gridCfg.d_absorb)) {
-        detAnt1D_write2hdf5( gridCfg.Nx, filename_hdf5, "/detAnt_02" , 
+        detAnt1D_write2hdf5( gridCfg.Nx, filename_hf5, "/detAnt_02" , 
                              detAnt_01_ypos, detAnt_02_zpos,
                              detAnt_02_fields );
     }
     if (detAnt_03_zpos < (gridCfg.Nz - gridCfg.d_absorb)) {
-        detAnt1D_write2hdf5( gridCfg.Nx, filename_hdf5, "/detAnt_03" , 
+        detAnt1D_write2hdf5( gridCfg.Nx, filename_hf5, "/detAnt_03" , 
                              detAnt_01_ypos, detAnt_03_zpos,
                              detAnt_03_fields );
     }
     if (detAnt_04_zpos < (gridCfg.Nz - gridCfg.d_absorb)) {
-        detAnt1D_write2hdf5( gridCfg.Nx, filename_hdf5, "/detAnt_04" , 
+        detAnt1D_write2hdf5( gridCfg.Nx, filename_hf5, "/detAnt_04" , 
                              detAnt_01_ypos, detAnt_04_zpos,
                              detAnt_04_fields );
     }

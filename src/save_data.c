@@ -79,6 +79,7 @@ void copyJSON(const char *path, const char *foldername){
     printf("JSON file saved.\n");
 }
 
+//Function calls previous functions
 void create_folder_path(gridConfiguration *gridCfg){
 
     simulation_folder(gridCfg->path);

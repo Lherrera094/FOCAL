@@ -30,58 +30,7 @@ int set2zero_3D( size_t N_x, size_t N_y, size_t N_z, double arr_3D[N_x][N_y][N_z
 
 void gridConfInit(gridConfiguration *gridCfg, int boundary){
 
-    /*Read JSON and extract data*/
-    char *json_file = read_json();
-    
-    if(json_file == NULL){
-        printf("JSON file doesn't exists.");
-        return;
-    }
-
-    //Parse the JSON string
-    cJSON *json = cJSON_Parse(json_file);
-    if(json == NULL){
-        printf("Error at parse JSON string");
-        free(json_file);
-        return;
-    }
-
-    //Extract data from JSON file. Save folder info
-    cJSON *Main_Project = cJSON_GetObjectItemCaseSensitive(json, "Main_Project");   //Main Project path
-    if( cJSON_IsString(Main_Project) && (Main_Project->valuestring != NULL) ){
-        gridCfg->path = strdup(Main_Project->valuestring);
-    }
-
-    cJSON *FolderName = cJSON_GetObjectItemCaseSensitive(json, "foldername");       //Simulation folder name
-    if( cJSON_IsString(FolderName) && (FolderName->valuestring != NULL) ){
-        gridCfg->foldername = strdup(FolderName->valuestring);
-    }
-
-    cJSON *Filename_HDF5 = cJSON_GetObjectItemCaseSensitive(json, "filename_hdf5");   //filename hdf5
-    if( cJSON_IsString(Filename_HDF5) && (Filename_HDF5->valuestring != NULL) ){
-        gridCfg->filename_h5 = strdup(Filename_HDF5->valuestring);
-    }
-
-    cJSON *Filename_TimeTrace = cJSON_GetObjectItemCaseSensitive(json, "filename_timetraces");   //filename datatraces
-    if( cJSON_IsString(Filename_TimeTrace) && (Filename_TimeTrace->valuestring != NULL) ){
-        gridCfg->filename_timetraces = strdup(Filename_TimeTrace->valuestring);
-    }
-    
-    //Initialize Grid Configuration values
-    cJSON *item_scale = cJSON_GetObjectItemCaseSensitive(json, "scale");   //scale factor
-    if( cJSON_IsNumber(item_scale) ){
-        gridCfg->scale = item_scale->valueint;
-    }
-
-    cJSON *item_period = cJSON_GetObjectItemCaseSensitive(json, "period");   //wave period
-    if( cJSON_IsNumber(item_period) ){
-        gridCfg->period = item_period->valuedouble;
-        gridCfg->period = gridCfg->period * gridCfg->scale;
-    }
-
-    //clean up
-    cJSON_Delete(json);
-    free(json_file);
+    save_json_data( gridCfg);
 
     if (boundary == 1){
         gridCfg->d_absorb = (int)(3*gridCfg->period);
@@ -94,9 +43,6 @@ void gridConfInit(gridConfiguration *gridCfg, int boundary){
     gridCfg->Nz  = (200+0*150)*gridCfg->scale;
     gridCfg->Nz_ref  = 2*gridCfg->d_absorb + (int)gridCfg->period;
     gridCfg->t_end   = (int)((100-50)*gridCfg->period);
-
-    gridCfg->B0_profile  = 1;
-    gridCfg->ne_profile  = 3;
 
     // dt/dx = 0.5 is commenly used in 2D FDTD codes
     // Note that period refers to the wavelength in the numerical grid and not
@@ -163,5 +109,70 @@ char *read_json(){
 
 }
 
+void save_json_data(gridConfiguration *gridCfg){
 
+    /*Read JSON and extract data*/
+    char *json_file = read_json();
+    
+    if(json_file == NULL){
+        printf("JSON file doesn't exists.");
+        return;
+    }
+
+    //Parse the JSON string
+    cJSON *json = cJSON_Parse(json_file);
+    if(json == NULL){
+        printf("Error at parse JSON string");
+        free(json_file);
+        return;
+    }
+
+    //Extract data from JSON file. Save folder info
+    cJSON *Main_Project = cJSON_GetObjectItemCaseSensitive(json, "Main_Project");   //Main Project path
+    if( cJSON_IsString(Main_Project) && (Main_Project->valuestring != NULL) ){
+        gridCfg->path = strdup(Main_Project->valuestring);
+    }
+
+    cJSON *FolderName = cJSON_GetObjectItemCaseSensitive(json, "foldername");       //Simulation folder name
+    if( cJSON_IsString(FolderName) && (FolderName->valuestring != NULL) ){
+        gridCfg->foldername = strdup(FolderName->valuestring);
+    }
+
+    cJSON *Filename_HDF5 = cJSON_GetObjectItemCaseSensitive(json, "filename_hdf5");   //filename hdf5
+    if( cJSON_IsString(Filename_HDF5) && (Filename_HDF5->valuestring != NULL) ){
+        gridCfg->filename_h5 = strdup(Filename_HDF5->valuestring);
+    }
+
+    cJSON *Filename_TimeTrace = cJSON_GetObjectItemCaseSensitive(json, "filename_timetraces");   //filename datatraces
+    if( cJSON_IsString(Filename_TimeTrace) && (Filename_TimeTrace->valuestring != NULL) ){
+        gridCfg->filename_timetraces = strdup(Filename_TimeTrace->valuestring);
+    }
+    
+    //Initialize Grid Configuration values
+    cJSON *item_scale = cJSON_GetObjectItemCaseSensitive(json, "scale");   //scale factor
+    if( cJSON_IsNumber(item_scale) ){
+        gridCfg->scale = item_scale->valueint;
+    }
+
+    cJSON *item_period = cJSON_GetObjectItemCaseSensitive(json, "period");   //wave period
+    if( cJSON_IsNumber(item_period) ){
+        gridCfg->period = item_period->valuedouble;
+        gridCfg->period = (double) gridCfg->period * gridCfg->scale;
+    }
+
+    cJSON *item_B0 = cJSON_GetObjectItemCaseSensitive(json, "B0_profile");   //External B0 profile 
+    if( cJSON_IsNumber(item_B0) ){
+        gridCfg->B0_profile = item_B0->valueint;
+    }
+
+    cJSON *item_ne = cJSON_GetObjectItemCaseSensitive(json, "n_e_profile");   //n_e profile 
+    if( cJSON_IsNumber(item_ne) ){
+        gridCfg->ne_profile = item_ne->valueint;
+    }
+
+    //clean up
+    cJSON_Delete(json);
+    free(json_file);
+
+}
 

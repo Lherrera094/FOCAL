@@ -84,7 +84,7 @@ int make_density_profile( gridConfiguration *gridCfg,
                                                 +pow((double)kk-(double)gridCfg->Nz/4., 2)/(2*pow(gridCfg->period/2.,2))
                                              )) * 5.;
                 }
-            }
+            }  
         }
     } else if ( gridCfg->ne_profile == 4 ) {
         // same as ne_profile = 3, but plasma cylinder is now along y
