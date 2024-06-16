@@ -10,7 +10,7 @@ void simulation_folder(const char *path){
         if(mkdir(path, 0700) == 0){
             printf("Main project folder created successfully.\n");
         }else{
-            printf("Error creating directory: %s\n", strerror(errno));
+            printf("Error creating directory: %s\n", path);
             return;
         }
     }
@@ -34,7 +34,7 @@ void data_folder(const char *path, const char *foldername){
         if( mkdir(fullPath, 0700) == 0){
             printf("%s folder created successfully. \n", foldername);
         }else{
-            printf("Error creating directory: %s\n", strerror(errno));
+            printf("Error creating directory: %s\n", foldername);
             return;
         }
     }else{
@@ -79,12 +79,11 @@ void copyJSON(const char *path, const char *foldername){
     printf("JSON file saved.\n");
 }
 
-//Function calls previous functions
-void create_folder_path(gridConfiguration *gridCfg){
+void create_folder_path(namePath *pathFile){
 
-    simulation_folder(gridCfg->path);
-    data_folder(gridCfg->path, gridCfg->foldername);
-    copyJSON(gridCfg->path, gridCfg->foldername);
+    simulation_folder(pathFile->projectPath);
+    data_folder(pathFile->projectPath, pathFile->foldername);
+    copyJSON(pathFile->projectPath, pathFile->foldername);
     
 }
 

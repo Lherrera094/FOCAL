@@ -1,3 +1,9 @@
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+//#include "../include/focal.h"
+#include "focal.h"
 #include "antenna.h"
 
 int make_antenna_profile( gridConfiguration *gridCfg, beamConfiguration *beamCfg, 

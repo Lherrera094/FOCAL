@@ -1,4 +1,11 @@
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "focal.h"
 #include "background_profiles.h"
+#include "hdf5.h"
+#include "grid_io.h"
 
 int make_density_profile( gridConfiguration *gridCfg, 
                           double cntrl_para, 
@@ -84,7 +91,7 @@ int make_density_profile( gridConfiguration *gridCfg,
                                                 +pow((double)kk-(double)gridCfg->Nz/4., 2)/(2*pow(gridCfg->period/2.,2))
                                              )) * 5.;
                 }
-            }  
+            }
         }
     } else if ( gridCfg->ne_profile == 4 ) {
         // same as ne_profile = 3, but plasma cylinder is now along y

@@ -1,3 +1,8 @@
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "focal.h"
 #include "power_calc.h"
 
 double calc_poynt_4( gridConfiguration *gridCfg, 
@@ -604,4 +609,5 @@ double calc_poynt_7( size_t N_x, size_t N_y, size_t N_z, size_t N_z_ref,
     
     return fabs(poynt);
 } //}}}
+
 
