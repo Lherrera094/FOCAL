@@ -5,16 +5,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "focal-grid.h"
 #include "cJSON.h"
+#include "focal.h"
 
 //functions in initialize grid
-int set2zero_1D( size_t N_x, double arr_1D[N_x] );
-int set2zero_3D( size_t N_x, size_t N_y, size_t N_z, double arr_3D[N_x][N_y][N_z] );
-void gridConfInit(gridConfiguration *gridCfg, int boundary);
+void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, int boundary, beamConfiguration *beamCfg);
 void antenaInit(gridConfiguration *gridCfg, beamConfiguration *beamCfg);
-void gridInit(gridConfiguration *gridCfg, Grid *G);
 char *read_json();
-void save_json_data(gridConfiguration *gridCfg);
+void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfiguration *beamCfg);
 
 #endif

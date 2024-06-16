@@ -36,11 +36,11 @@ def readhdf5( fname, dSet_name ):
     err_value = 1
 
     # if file exists, open it for reading
-    #if os.path.isfile( fname ):
-    h5f = h5py.File( fname, 'r' )
-    #else:
-    #    print( 'ERROR: cannot read following file: {0}'.format( fname ))
-    #    return err_value
+    if os.path.isfile( fname ):
+        h5f = h5py.File( fname, 'r' )
+    else:
+        print( 'ERROR: cannot read following file: {0}'.format( fname ))
+        return err_value
 
     # trying to read dataset
     if dSet_name in h5f:
@@ -130,7 +130,7 @@ def main():
     # add optional arguments
     parser.add_argument( "-f", "--filename", type=str, default="fileout.h5",
                          help="Filename of hdf5 output file from FOCAL." )
-    parser.add_argument( "-d", "--dSet_name", type=str, default="n_e",
+    parser.add_argument( "-d", "--dSet_name", type=str, default="",
                          help="Dataset name to be plotted." )
     parser.add_argument( "-c", "--contLevels", type=int, default=20,
                          help="Number of contour levels used." )

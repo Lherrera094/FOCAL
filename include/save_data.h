@@ -6,11 +6,11 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
-#include "focal-grid.h"
+#include "focal.h"
 
 void simulation_folder(const char *path);
 void data_folder(const char *path, const char *foldername);
 void copyJSON(const char *path, const char *foldername);
-void create_folder_path(gridConfiguration *gridCfg);
+void create_folder_path(namePath *pathFile);
 
 #endif
