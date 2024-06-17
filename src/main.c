@@ -57,6 +57,7 @@
 #include "power_calc.h"
 #include "initialize_grid.h"
 #include "save_data.h"
+#include "boundaries.h"
 
 
 int main( int argc, char *argv[] ) {
@@ -271,7 +272,7 @@ int main( int argc, char *argv[] ) {
     printf( "antAngle_zx = %.2f, antAngle_zy = %.2f\n", beamCfg.antAngle_zx, beamCfg.antAngle_zy );
     printf( "ant_w0x = %.2f, ant_w0y = %.2f\n", beamCfg.ant_w0x, beamCfg.ant_w0y ); 
     printf( "ant_x = %d, ant_y = %d, ant_z = %d\n", beamCfg.ant_x, beamCfg.ant_y, beamCfg.ant_z );
-    printf( "Boundary condition set to '%d'\n", BOUNDARY );
+    printf( "Boundary condition set to '%d'\n", pathFile.boundary );
 #ifdef DETECTOR_ANTENNA_1D
     printf( "detector antenna positions: z1 = %d, y1 = %d\n", detAnt_01_zpos, detAnt_01_ypos );
     printf( "detector antenna positions: z2 = %d, y1 = %d\n", detAnt_02_zpos, detAnt_01_ypos );

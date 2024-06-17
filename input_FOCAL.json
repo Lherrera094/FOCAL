@@ -22,6 +22,8 @@
     "RampUp_Method": 1,
     "Antena_w0x": 2.0,
     "Antena_w0y": 2.0,
-    "z2waist":-298.87
+    "z2waist":-298.87,
+    
+    "Detector_Antenna": 1
     
 }

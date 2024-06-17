@@ -3,15 +3,11 @@
 void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, int boundary, beamConfiguration *beamCfg){
 
     write_JSON_onGrid( gridCfg, pathFile, beamCfg);
-    printf("It reads the boundary and save it in pathFile. %d \n", pathFile->boundary);
-    printf("It reads the boundary and save it in pathFile. %s \n", pathFile->foldername);
-    printf("It reads the boundary and save it in pathFile. %s \n", pathFile->projectPath);
-    printf("It reads the boundary and save it in pathFile. %s \n", pathFile->file_hdf5);
+    
     //Grid configuration variables computation
-    if (boundary == 1){ 
-        
+    if (pathFile->boundary == 1){     
         gridCfg->d_absorb = (int)(3*gridCfg->period);
-    }else if (boundary == 2){
+    }else if (pathFile->boundary == 2){
         gridCfg->d_absorb = 8;
     }
     
