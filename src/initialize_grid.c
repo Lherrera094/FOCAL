@@ -1,8 +1,8 @@
 #include "initialize_grid.h"
 
-void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, int boundary, beamConfiguration *beamCfg){
+void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, beamConfiguration *beamCfg, antennaDetector *ant_Detect){
 
-    write_JSON_onGrid( gridCfg, pathFile, beamCfg);
+    write_JSON_onGrid( gridCfg, pathFile, beamCfg, ant_Detect);
     
     //Grid configuration variables computation
     if (pathFile->boundary == 1){     
@@ -61,7 +61,7 @@ char *read_json(){
 
 }
 
-void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfiguration *beamCfg){
+void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfiguration *beamCfg, antennaDetector *ant_Detect){
 
     /*Read JSON and extract data*/
     char *json_file = read_json();
@@ -101,6 +101,16 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
     if( cJSON_IsString(Filename_TimeTrace) && (Filename_TimeTrace->valuestring != NULL) ){
         pathFile->file_trace = strdup(Filename_TimeTrace->valuestring);
     }
+
+    cJSON *item_boundary = cJSON_GetObjectItemCaseSensitive(json, "Boundary_Method");   //boundary option
+    if( cJSON_IsNumber(item_boundary) ){
+        pathFile->boundary = item_boundary->valueint;
+    }  
+
+    cJSON *item_antDetect = cJSON_GetObjectItemCaseSensitive(json, "Detector_Antenna");   //Activate Antenna
+    if( cJSON_IsNumber(item_antDetect) ){
+        ant_Detect->antDetect_1D = item_antDetect->valueint;
+    }       
     
     cJSON *item_scale = cJSON_GetObjectItemCaseSensitive(json, "scale");   //scale factor
     if( cJSON_IsNumber(item_scale) ){
@@ -179,12 +189,7 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
     if( cJSON_IsNumber(item_z2waist) ){
         z2w = item_z2waist->valuedouble;
         beamCfg->z2waist = z2w * .0;            // .2/l_0*period = -298.87
-    }    
-
-    cJSON *item_boundary = cJSON_GetObjectItemCaseSensitive(json, "Boundary");   //boundary option
-    if( cJSON_IsNumber(item_boundary) ){
-        pathFile->boundary = item_boundary->valueint;
-    }            
+    }        
 
     //clean up
     cJSON_Delete(json);

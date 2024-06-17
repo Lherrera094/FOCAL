@@ -14,7 +14,7 @@
     "B0_profile":1,
     "ne_profile":3,
     
-    "Boundary": 1,
+    "Boundary_Method": 1,
     
     "Antenna_Angle_zx": 0,
     "Antenna_Angle_zy": 0,

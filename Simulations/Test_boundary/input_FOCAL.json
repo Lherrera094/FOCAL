@@ -14,7 +14,7 @@
     "B0_profile":1,
     "ne_profile":3,
     
-    "Boundary": 1,
+    "Boundary_Method": 1,
     
     "Antenna_Angle_zx": 0,
     "Antenna_Angle_zy": 0,
@@ -22,6 +22,8 @@
     "RampUp_Method": 1,
     "Antena_w0x": 2.0,
     "Antena_w0y": 2.0,
-    "z2waist":-298.87
+    "z2waist":-298.87,
+    
+    "Detector_Antenna": 1
     
 }

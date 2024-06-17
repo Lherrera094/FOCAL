@@ -9,8 +9,8 @@
 #include "focal.h"
 
 //functions in initialize grid
-void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, int boundary, beamConfiguration *beamCfg);
+void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, beamConfiguration *beamCfg, antennaDetector *ant_Detect);
 char *read_json();
-void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfiguration *beamCfg);
+void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfiguration *beamCfg, antennaDetector *ant_Detect);
 
 #endif

@@ -28,6 +28,12 @@ typedef struct namePath{
     		    *file_hdf5, *file_trace;
     int boundary;
 } namePath;
+typedef struct antennaDetector{
+    int antDetect_1D, 
+        detAnt_01_zpos, detAnt_02_zpos,
+        detAnt_03_zpos,detAnt_04_zpos,
+        detAnt_01_ypos;
+} antennaDetector;
 
 
 #endif
