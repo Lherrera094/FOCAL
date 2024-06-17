@@ -4,6 +4,7 @@ void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, int boundary, 
 
     write_JSON_onGrid( gridCfg, pathFile, beamCfg);
 
+    //Grid configuration variables computation
     if (boundary == 1){ 
         gridCfg->d_absorb = (int)(3*gridCfg->period);
     }else if (boundary == 2){
@@ -21,12 +22,7 @@ void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, int boundary, 
     gridCfg->dx  = 1./(gridCfg->period/2);
     gridCfg->dt  = 1./(2.*(gridCfg->period/2));
 
-    // default values to be used if input parameter are not set
-    beamCfg->antAngle_zx     = 0;
-    beamCfg->antAngle_zy     = 0;
-
-    beamCfg->exc_signal  = 5;//3;//4;
-    beamCfg->rampUpMethod= 1;
+    //Beam Configuration variables computation
     beamCfg->ant_x       = gridCfg->d_absorb + 8*gridCfg->period;//gridCfg.Nx/2;
     beamCfg->ant_y       = gridCfg->Ny/2;
     beamCfg->ant_z       = gridCfg->d_absorb + 4;
@@ -34,32 +30,9 @@ void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, int boundary, 
     if ((beamCfg->ant_x % 2) != 0)  ++beamCfg->ant_x;
     if ((beamCfg->ant_y % 2) != 0)  ++beamCfg->ant_y;
     if ((beamCfg->ant_z % 2) != 0)  ++beamCfg->ant_z;
-    beamCfg->ant_w0x     = 2;
-    beamCfg->ant_w0y     = 2;
-    beamCfg->z2waist     = -(298.87)*.0;                // .2/l_0*period = -298.87
 
 }
 
-void antenaInit(gridConfiguration *gridCfg, beamConfiguration *beamCfg){
-
-    // default values to be used if input parameter are not set
-    beamCfg->antAngle_zx     = 0;
-    beamCfg->antAngle_zy     = 0;
-
-    beamCfg->exc_signal  = 5;//3;//4;
-    beamCfg->rampUpMethod= 1;
-    beamCfg->ant_x       = gridCfg->d_absorb + 8*gridCfg->period;//gridCfg.Nx/2;
-    beamCfg->ant_y       = gridCfg->Ny/2;
-    beamCfg->ant_z       = gridCfg->d_absorb + 4;
-    // positions have to be even numbers, to ensure fields are accessed correctly
-    if ((beamCfg->ant_x % 2) != 0)  ++beamCfg->ant_x;
-    if ((beamCfg->ant_y % 2) != 0)  ++beamCfg->ant_y;
-    if ((beamCfg->ant_z % 2) != 0)  ++beamCfg->ant_z;
-    beamCfg->ant_w0x     = 2;
-    beamCfg->ant_w0y     = 2;
-    beamCfg->z2waist     = -(298.87)*.0;                // .2/l_0*period = -298.87
-
-}
 
 char *read_json(){
 
@@ -128,19 +101,18 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
         pathFile->file_trace = strdup(Filename_TimeTrace->valuestring);
     }
     
-    //Initialize Grid Configuration values
     cJSON *item_scale = cJSON_GetObjectItemCaseSensitive(json, "scale");   //scale factor
     if( cJSON_IsNumber(item_scale) ){
         scale = item_scale->valueint;
     }
 
+    /*Grid configuration Input values*/
     cJSON *item_period = cJSON_GetObjectItemCaseSensitive(json, "period");   //wave period
     if( cJSON_IsNumber(item_period) ){
         gridCfg->period = item_period->valuedouble;
         gridCfg->period = gridCfg->period * scale;
     }
     
-    //Initialize Grid Configuration values
     cJSON *item_Nx = cJSON_GetObjectItemCaseSensitive(json, "Grid_size_Nx");   //scale factor
     if( cJSON_IsNumber(item_Nx) ){
         gridCfg->Nx = item_Nx->valueint;
@@ -168,6 +140,43 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
     if( cJSON_IsNumber(item_ne) ){
         gridCfg->ne_profile = item_ne->valueint;
     }
+
+
+    /*Antenna Input values*/
+    // default values to be used if input parameter are not set
+    cJSON *item_antAngleZX = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Angle_zx");   //scale factor
+    if( cJSON_IsNumber(item_antAngleZX) ){
+        beamCfg->antAngle_zx = item_antAngleZX->valueint;
+    }
+
+    cJSON *item_antAngleZY = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Angle_zy");   //scale factor
+    if( cJSON_IsNumber(item_antAngleZY) ){
+        beamCfg->antAngle_zy = item_antAngleZY->valueint;
+    }
+
+    cJSON *item_exc_signal = cJSON_GetObjectItemCaseSensitive(json, "External_signal");   //scale factor
+    if( cJSON_IsNumber(item_exc_signal) ){
+        beamCfg->exc_signal = item_exc_signal->valueint;
+    }
+
+    cJSON *item_rampUpMethod = cJSON_GetObjectItemCaseSensitive(json, "RampUp_Method");   //scale factor
+    if( cJSON_IsNumber(item_rampUpMethod) ){
+        beamCfg->rampUpMethod = item_rampUpMethod->valueint;
+    }
+
+    cJSON *item_ant_w0x = cJSON_GetObjectItemCaseSensitive(json, "Antena_w0x");   //scale factor
+    if( cJSON_IsNumber(item_ant_w0x) ){
+        beamCfg->ant_w0x = item_ant_w0x->valuedouble;
+    }
+
+    cJSON *item_ant_w0y = cJSON_GetObjectItemCaseSensitive(json, "Antena_w0y");   //scale factor
+    if( cJSON_IsNumber(item_ant_w0y) ){
+        beamCfg->ant_w0y = item_ant_w0y->valuedouble;
+    }
+
+    //beamCfg->ant_w0x     = 2;
+    //beamCfg->ant_w0y     = 2;
+    beamCfg->z2waist     = -(298.87)*.0;                // .2/l_0*period = -298.87
 
     //clean up
     cJSON_Delete(json);

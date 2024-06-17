@@ -165,9 +165,6 @@ int main( int argc, char *argv[] ) {
     // used for checking if input parameter was provided
     angle_zx_set    = false;
     angle_zy_set    = false;
-    // default values to be used if input parameter are not set
-    //beamCfg.antAngle_zx     = 0;
-    //beamCfg.antAngle_zy     = 0;
     
     // loop through input parameter
     printf( "number of input parameters provided during call: %d\n", argc-1 );
@@ -187,21 +184,6 @@ int main( int argc, char *argv[] ) {
         if (angle_zx_set)   printf( "    antAngle_zx = %f\n", beamCfg.antAngle_zx );
         if (angle_zy_set)   printf( "    antAngle_zy = %f\n", beamCfg.antAngle_zy );
     }
-
-    /*
-    beamCfg.exc_signal  = 5;//3;//4;
-    beamCfg.rampUpMethod= 1;
-    beamCfg.ant_x       = gridCfg.d_absorb + 8*gridCfg.period;//gridCfg.Nx/2;
-    beamCfg.ant_y       = gridCfg.Ny/2;
-    beamCfg.ant_z       = gridCfg.d_absorb + 4;
-    // positions have to be even numbers, to ensure fields are accessed correctly
-    if ((beamCfg.ant_x % 2) != 0)  ++beamCfg.ant_x;
-    if ((beamCfg.ant_y % 2) != 0)  ++beamCfg.ant_y;
-    if ((beamCfg.ant_z % 2) != 0)  ++beamCfg.ant_z;
-    beamCfg.ant_w0x     = 2;
-    beamCfg.ant_w0y     = 2;
-    beamCfg.z2waist     = -(298.87)*.0;                // .2/l_0*period = -298.87
-    */
 
     pwr_dect    = gridCfg.d_absorb;
 

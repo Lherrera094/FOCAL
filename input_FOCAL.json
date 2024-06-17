@@ -14,6 +14,13 @@
     "B0_profile":1,
     "ne_profile":3,
     
-    "boundary": 1
+    "boundary": 1,
+    
+    "Antenna_Angle_zx": 0,
+    "Antenna_Angle_zy": 0,
+    "External_signal": 5,
+    "RampUp_Method": 1,
+    "Antena_w0x": 2.0,
+    "Antena_w0y": 2.0
     
 }

@@ -10,7 +10,6 @@
 
 //functions in initialize grid
 void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, int boundary, beamConfiguration *beamCfg);
-void antenaInit(gridConfiguration *gridCfg, beamConfiguration *beamCfg);
 char *read_json();
 void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfiguration *beamCfg);
 
