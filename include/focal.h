@@ -33,7 +33,7 @@ typedef struct beamConfiguration {
 typedef struct namePath{
     const char 	*foldername, *projectPath,
     		    *file_hdf5, *file_trace;
-
+    int boundary;
 } namePath;
 
 

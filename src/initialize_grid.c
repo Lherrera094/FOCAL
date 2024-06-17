@@ -3,9 +3,13 @@
 void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, int boundary, beamConfiguration *beamCfg){
 
     write_JSON_onGrid( gridCfg, pathFile, beamCfg);
-
+    printf("It reads the boundary and save it in pathFile. %d \n", pathFile->boundary);
+    printf("It reads the boundary and save it in pathFile. %s \n", pathFile->foldername);
+    printf("It reads the boundary and save it in pathFile. %s \n", pathFile->projectPath);
+    printf("It reads the boundary and save it in pathFile. %s \n", pathFile->file_hdf5);
     //Grid configuration variables computation
     if (boundary == 1){ 
+        
         gridCfg->d_absorb = (int)(3*gridCfg->period);
     }else if (boundary == 2){
         gridCfg->d_absorb = 8;
@@ -66,6 +70,7 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
     /*Read JSON and extract data*/
     char *json_file = read_json();
     int scale;
+    double z2w;
 
     if(json_file == NULL){
         printf("JSON file doesn't exists.");
@@ -113,30 +118,30 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
         gridCfg->period = gridCfg->period * scale;
     }
     
-    cJSON *item_Nx = cJSON_GetObjectItemCaseSensitive(json, "Grid_size_Nx");   //scale factor
+    cJSON *item_Nx = cJSON_GetObjectItemCaseSensitive(json, "Grid_size_Nx");   //grid size in x
     if( cJSON_IsNumber(item_Nx) ){
         gridCfg->Nx = item_Nx->valueint;
         gridCfg->Nx = (gridCfg->Nx + 0*200) * scale;
     }
 
-    cJSON *item_Ny = cJSON_GetObjectItemCaseSensitive(json, "Grid_size_Ny");   //scale factor
+    cJSON *item_Ny = cJSON_GetObjectItemCaseSensitive(json, "Grid_size_Ny");   //grid size in y 
     if( cJSON_IsNumber(item_Ny) ){
         gridCfg->Ny = item_Ny->valueint;
         gridCfg->Ny = (gridCfg->Ny + 0*100) * scale;
     }
 
-    cJSON *item_Nz = cJSON_GetObjectItemCaseSensitive(json, "Grid_size_Nz");   //scale factor
+    cJSON *item_Nz = cJSON_GetObjectItemCaseSensitive(json, "Grid_size_Nz");   //grid size in z
     if( cJSON_IsNumber(item_Nz) ){
         gridCfg->Nz = item_Nz->valueint;
         gridCfg->Nz = (gridCfg->Nz + 0*150) * scale;
     }
 
-    cJSON *item_B0 = cJSON_GetObjectItemCaseSensitive(json, "B0_profile");   //scale factor
+    cJSON *item_B0 = cJSON_GetObjectItemCaseSensitive(json, "B0_profile");   //external magnetic field option
     if( cJSON_IsNumber(item_B0) ){
         gridCfg->B0_profile = item_B0->valueint;
     }
 
-    cJSON *item_ne = cJSON_GetObjectItemCaseSensitive(json, "ne_profile");   //scale factor
+    cJSON *item_ne = cJSON_GetObjectItemCaseSensitive(json, "ne_profile");   //plasma density option
     if( cJSON_IsNumber(item_ne) ){
         gridCfg->ne_profile = item_ne->valueint;
     }
@@ -144,22 +149,22 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
 
     /*Antenna Input values*/
     // default values to be used if input parameter are not set
-    cJSON *item_antAngleZX = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Angle_zx");   //scale factor
+    cJSON *item_antAngleZX = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Angle_zx");   //zx plane angle antenna
     if( cJSON_IsNumber(item_antAngleZX) ){
         beamCfg->antAngle_zx = item_antAngleZX->valueint;
     }
 
-    cJSON *item_antAngleZY = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Angle_zy");   //scale factor
+    cJSON *item_antAngleZY = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Angle_zy");   //zy plane angle antenna
     if( cJSON_IsNumber(item_antAngleZY) ){
         beamCfg->antAngle_zy = item_antAngleZY->valueint;
     }
 
-    cJSON *item_exc_signal = cJSON_GetObjectItemCaseSensitive(json, "External_signal");   //scale factor
+    cJSON *item_exc_signal = cJSON_GetObjectItemCaseSensitive(json, "External_signal");   //Signal source option
     if( cJSON_IsNumber(item_exc_signal) ){
         beamCfg->exc_signal = item_exc_signal->valueint;
     }
 
-    cJSON *item_rampUpMethod = cJSON_GetObjectItemCaseSensitive(json, "RampUp_Method");   //scale factor
+    cJSON *item_rampUpMethod = cJSON_GetObjectItemCaseSensitive(json, "RampUp_Method");   //RampUp method option
     if( cJSON_IsNumber(item_rampUpMethod) ){
         beamCfg->rampUpMethod = item_rampUpMethod->valueint;
     }
@@ -174,9 +179,16 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
         beamCfg->ant_w0y = item_ant_w0y->valuedouble;
     }
 
-    //beamCfg->ant_w0x     = 2;
-    //beamCfg->ant_w0y     = 2;
-    beamCfg->z2waist     = -(298.87)*.0;                // .2/l_0*period = -298.87
+    cJSON *item_z2waist = cJSON_GetObjectItemCaseSensitive(json, "z2waist");   //
+    if( cJSON_IsNumber(item_z2waist) ){
+        z2w = item_z2waist->valuedouble;
+        beamCfg->z2waist = z2w * .0;            // .2/l_0*period = -298.87
+    }    
+
+    cJSON *item_boundary = cJSON_GetObjectItemCaseSensitive(json, "Boundary");   //boundary option
+    if( cJSON_IsNumber(item_boundary) ){
+        pathFile->boundary = item_boundary->valueint;
+    }            
 
     //clean up
     cJSON_Delete(json);
