@@ -112,11 +112,6 @@ int main( int argc, char *argv[] ) {
     gridConfInit( &gridCfg, &pathFile, &beamCfg, &ant_Detect);  
     create_folder_path( &pathFile);
     initialize_antDetect( &ant_Detect, &gridCfg, &beamCfg);
-    
-    if (snprintf(fullDir, sizeof(fullDir),"%s/%s", pathFile.projectPath, pathFile.foldername) >= sizeof(fullDir)) {
-        fprintf(stderr, "Error: Directory path is too long.\n");
-        return -1;
-    }
 
     // arrays realized as variable-length array (VLA)
     // E- and B-wavefield
@@ -147,15 +142,16 @@ int main( int argc, char *argv[] ) {
 
     // array for detector antennas
     // sum_t(Ex*Ex) | sum_t(Ey*Ey) | sum_t(Ez*Ez) | sum_t(E*E) | rms(E)
-    if(ant_Detect.antDetect_1D == 1){
-        // TODO: change into 3D array, such that each detector antenna corresponds
-        //       to one 2D array; that way it can be written much more failsafe...
-        //       requires some changes in procedures for storing and saving
-        double (*detAnt_01_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_01_fields);
-        double (*detAnt_02_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_02_fields);
-        double (*detAnt_03_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_03_fields);
-        double (*detAnt_04_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_04_fields);
-    }
+#ifdef DETECTOR_ANTENNA_1D
+    // TODO: change into 3D array, such that each detector antenna corresponds
+    //       to one 2D array; that way it can be written much more failsafe...
+    //       requires some changes in procedures for storing and saving
+    double (*detAnt_01_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_01_fields);
+    double (*detAnt_02_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_02_fields);
+    double (*detAnt_03_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_03_fields);
+    double (*detAnt_04_fields)[5]       = calloc(gridCfg.Nx, sizeof *detAnt_04_fields);
+#endif
+
 
     // reading input parameter
     // used for checking if input parameter was provided
@@ -282,11 +278,6 @@ int main( int argc, char *argv[] ) {
                         antField_xy, antPhaseTerms, EB_WAVE_ref );
 
         // apply absorbers
-/*#if BOUNDARY == 1
-        apply_absorber(     &gridCfg, eco, EB_WAVE );
-        apply_absorber_ref( &gridCfg, eco, EB_WAVE_ref );
-#endif*/
-        // apply absorbers
         if(pathFile.boundary == 1){
             apply_absorber(     &gridCfg, eco, EB_WAVE );
             apply_absorber_ref( &gridCfg, eco, EB_WAVE_ref );
@@ -326,6 +317,34 @@ int main( int argc, char *argv[] ) {
         abc_Mur_saveOldEref_zdir( &gridCfg, EB_WAVE_ref, E_Zdir_OLD_ref );
 #endif
 
+        // store wavefields for detector antennas over the final 10 
+        // oscillation periods, it was found previously that only one period
+        // does not result in a too nice average
+        /*if(ant_Detect.antDetect_1D == 1){
+            
+            if ( t_int >= (gridCfg.t_end-10*gridCfg.period) ) {
+                if (ant_Detect.detAnt_01_zpos < (gridCfg.Nz - gridCfg.d_absorb)) {
+                    detAnt1D_storeValues( &gridCfg, ant_Detect.detAnt_01_ypos, ant_Detect.detAnt_01_zpos,
+                                        t_int,  
+                                        EB_WAVE, detAnt_01_fields );
+                }
+                if (ant_Detect.detAnt_02_zpos < (gridCfg.Nz - gridCfg.d_absorb)) {
+                    detAnt1D_storeValues( &gridCfg, ant_Detect.detAnt_01_ypos, ant_Detect.detAnt_02_zpos,
+                                        t_int, 
+                                        EB_WAVE, detAnt_02_fields );
+                }
+                if (ant_Detect.detAnt_03_zpos < (gridCfg.Nz - gridCfg.d_absorb)) {
+                    detAnt1D_storeValues( &gridCfg, ant_Detect.detAnt_01_ypos, ant_Detect.detAnt_03_zpos,
+                                        t_int,
+                                        EB_WAVE, detAnt_03_fields );
+                }
+                if (ant_Detect.detAnt_04_zpos < (gridCfg.Nz - gridCfg.d_absorb)) {
+                    detAnt1D_storeValues( &gridCfg, ant_Detect.detAnt_01_ypos, ant_Detect.detAnt_04_zpos,
+                                        t_int,
+                                        EB_WAVE, detAnt_04_fields );
+                }
+            }
+        }*/
 #ifdef DETECTOR_ANTENNA_1D
         // store wavefields for detector antennas over the final 10 
         // oscillation periods, it was found previously that only one period
@@ -418,6 +437,10 @@ int main( int argc, char *argv[] ) {
               );
     printf( "-------------------------------------------------------------------------------------------------------------\n" );
 
+    if (snprintf(fullDir, sizeof(fullDir),"%s/%s", pathFile.projectPath, pathFile.foldername) >= sizeof(fullDir)) {
+        fprintf(stderr, "Error: Directory path is too long.\n");
+        return -1;
+    }
     // write timetrace data into file
     // open file in w(rite) mode; might consider using a+ instead
     snprintf( filename_timetraces, sizeof(filename_timetraces), "%s/%s", fullDir, pathFile.file_trace);
