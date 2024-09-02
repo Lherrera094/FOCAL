@@ -1,6 +1,9 @@
 #include "initialize_grid.h"
 
-void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, beamConfiguration *beamCfg, antennaDetector *ant_Detect){
+void gridConfInit(  gridConfiguration *gridCfg, 
+                    namePath *pathFile, 
+                    beamConfiguration *beamCfg, 
+                    antennaDetector *ant_Detect){
 
     write_JSON_onGrid( gridCfg, pathFile, beamCfg, ant_Detect);
     
@@ -10,9 +13,16 @@ void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, beamConfigurat
     }else if (pathFile->boundary == 2){
         gridCfg->d_absorb = 8;
     }
+
+    //Checks that maximum density value is respected
+    // if density is larger than this value, FDTD code becomes instable
+    if(gridCfg->ne_max > gridCfg->period * 2./5.){
+        printf("Density value is too large for code stability. \n");
+        printf("Maximum density: %.3f. \n", gridCfg->period * 2./5.);
+        exit(-1);
+    }
     
     gridCfg->Nz_ref  = 2*gridCfg->d_absorb + (int)gridCfg->period;
-    gridCfg->t_end   = (int)((100-50)*gridCfg->period);
     
     // dt/dx = 0.5 is commenly used in 2D FDTD codes
     // Note that period refers to the wavelength in the numerical grid and not
@@ -22,10 +32,6 @@ void gridConfInit(gridConfiguration *gridCfg, namePath *pathFile, beamConfigurat
     gridCfg->dx  = 1./(gridCfg->period/2);
     gridCfg->dt  = 1./(2.*(gridCfg->period/2));
 
-    //Beam Configuration variables computation
-    beamCfg->ant_x       = gridCfg->d_absorb + 8*gridCfg->period;//gridCfg.Nx/2;
-    beamCfg->ant_y       = gridCfg->Ny/2;
-    beamCfg->ant_z       = gridCfg->d_absorb + 4;
     // positions have to be even numbers, to ensure fields are accessed correctly
     if ((beamCfg->ant_x % 2) != 0)  ++beamCfg->ant_x;
     if ((beamCfg->ant_y % 2) != 0)  ++beamCfg->ant_y;
@@ -107,6 +113,11 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
         pathFile->boundary = item_boundary->valueint;
     }  
 
+    cJSON *item_dBoundary = cJSON_GetObjectItemCaseSensitive(json, "PML_size");   //size absorb boundary
+    if( cJSON_IsNumber(item_dBoundary) ){
+        gridCfg->d_absorb = item_dBoundary->valueint;
+    }  
+
     cJSON *item_antDetect = cJSON_GetObjectItemCaseSensitive(json, "Detector_Antenna");   //Activate Antenna
     if( cJSON_IsNumber(item_antDetect) ){
         ant_Detect->antDetect_1D = item_antDetect->valueint;
@@ -152,9 +163,34 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
         gridCfg->ne_profile = item_ne->valueint;
     }
 
+    cJSON *item_tend = cJSON_GetObjectItemCaseSensitive(json, "t_end");   //plasma density option
+    if( cJSON_IsNumber(item_tend) ){
+        gridCfg->t_end = item_tend->valueint;
+        gridCfg->t_end = gridCfg->t_end*gridCfg->period;
+    }
+
+    cJSON *item_ne_value = cJSON_GetObjectItemCaseSensitive(json, "ne_value");   //plasma density option
+    if( cJSON_IsNumber(item_ne_value) ){
+        gridCfg->ne_max = item_ne_value->valuedouble;
+    }
 
     /*Antenna Input values*/
     // default values to be used if input parameter are not set
+    cJSON *item_ant_x = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Pos_x");   //Antenna x position
+    if( cJSON_IsNumber(item_ant_x) ){
+        beamCfg->ant_x = item_ant_x->valuedouble;
+    }
+
+    cJSON *item_ant_y = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Pos_y");   //Antenna y position
+    if( cJSON_IsNumber(item_ant_y) ){
+        beamCfg->ant_y = item_ant_y->valuedouble;
+    }
+
+    cJSON *item_ant_z = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Pos_z");   //Antenna z position
+    if( cJSON_IsNumber(item_ant_z) ){
+        beamCfg->ant_z = item_ant_z->valuedouble;
+    }
+
     cJSON *item_antAngleZX = cJSON_GetObjectItemCaseSensitive(json, "Antenna_Angle_zx");   //zx plane angle antenna
     if( cJSON_IsNumber(item_antAngleZX) ){
         beamCfg->antAngle_zx = item_antAngleZX->valueint;
@@ -196,6 +232,8 @@ void write_JSON_onGrid(gridConfiguration *gridCfg, namePath *pathFile, beamConfi
     free(json_file);
 
 }
+
+
 
 
 

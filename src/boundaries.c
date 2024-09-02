@@ -1034,3 +1034,295 @@ int abc_Mur_1st_ref( gridConfiguration *gridCfg,
     return EXIT_SUCCESS;
 
 } //}}}
+
+
+/*split PML related functions*/
+void initialize_split_PML(pmlBoundary *PML, gridConfiguration *gridCfg, int pml_size){
+
+    printf("Initializing Split-fields for PML Boundary conditions. \n");
+
+    ALLOC_3D(PML->EBx,  gridCfg->Nx, gridCfg->Ny, gridCfg->Nz, double);
+    ALLOC_3D(PML->EBy,  gridCfg->Nx, gridCfg->Ny, gridCfg->Nz, double);
+    ALLOC_3D(PML->EBz,  gridCfg->Nx, gridCfg->Ny, gridCfg->Nz, double);
+    ALLOC_3D(PML->EB,   gridCfg->Nx, gridCfg->Ny, gridCfg->Nz, double);
+
+    ALLOC_1D(PML->bx,  gridCfg->Nx, double);
+    ALLOC_1D(PML->by,  gridCfg->Ny, double);
+    ALLOC_1D(PML->bz,  gridCfg->Nz, double);
+    ALLOC_1D(PML->cx,  gridCfg->Nx, double);
+    ALLOC_1D(PML->cy,  gridCfg->Ny, double);
+    ALLOC_1D(PML->cz,  gridCfg->Nz, double);
+
+    split_PML_parameter(PML, gridCfg, pml_size);
+    
+}
+
+void apply_split_PML( pmlBoundary *PML, gridConfiguration *gridCfg, int pml_size,
+                      double EB_WAVE[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz] ){
+
+    int ii, jj, kk;
+
+    #pragma omp parallel for collapse(3) default(shared) private(ii,jj,kk) 
+    for ( ii=2 ; ii<gridCfg->Nx-2 ; ii+=2 ) {
+        for ( jj=2 ; jj<gridCfg->Ny-2 ; jj+=2 ) {
+            for ( kk=2 ; kk<gridCfg->Nz-2 ; kk+=2 ) {
+                if(ii <= pml_size + 2 || ii >= gridCfg->Nx - 2 - pml_size ||
+                   jj <= pml_size + 2 || jj >= gridCfg->Ny - 2 - pml_size || 
+                   kk <= pml_size + 2 || kk >= gridCfg->Nz - 2 - pml_size ){
+
+                    if(ii == pml_size + 2 && jj == pml_size + 2 && kk == pml_size + 2){
+                        printf("EBxy = %f \n", EBx(ii ,jj+1 ,kk) );
+                        printf("EBxz = %f \n", EBx(ii ,jj ,kk+1) );
+                        printf("EB_wave = %f \n", EB_WAVE[ii+1][jj+1][kk] );
+                        printf("EB_wave = %f \n", EB_WAVE[ii+1][jj-1][kk] );
+                    }
+
+                    //Ex split fields
+                    EBx(ii ,jj+1 ,kk) =  ( by(jj+1)*EBx(ii ,jj+1 ,kk) + 
+                                           cz(kk+1)*(EB_WAVE[ii+1][jj+1][kk] - EB_WAVE[ii+1][jj-1][kk]) );
+
+                    EBx(ii ,jj ,kk+1) =  ( bz(kk+1)*EBx(ii ,jj ,kk+1) - 
+                                           cy(jj+1)*(EB_WAVE[ii+1][jj][kk+1] - EB_WAVE[ii+1][jj][kk-1]) );
+
+                    //Ey split fields
+                    EBy(ii+1 ,jj ,kk) =  ( bx(ii+1)*EBy(ii+1 ,jj ,kk) - 
+                                           cz(kk+1)*(EB_WAVE[ii+1][jj+1][kk] - EB_WAVE[ii-1][jj+1][kk]) );
+
+                    EBy(ii ,jj ,kk+1) =  ( bz(kk+1)*EBy(ii ,jj ,kk+1) + 
+                                           cx(ii+1)*(EB_WAVE[ii][jj+1][kk+1] - EB_WAVE[ii][jj+1][kk-1]) );
+
+                    //Ez split fields
+                    EBz(ii+1 ,jj ,kk) =  ( bx(ii+1)*EBz(ii+1 ,jj ,kk) + 
+                                           cy(jj+1)*(EB_WAVE[ii+1][jj][kk+1] - EB_WAVE[ii-1][jj][kk+1]) );
+
+                    EBz(ii ,jj+1 ,kk) =  ( by(jj+1)*EBz(ii ,jj+1 ,kk) - 
+                                           cx(ii+1)*(EB_WAVE[ii][jj+1][kk+1] - EB_WAVE[ii][jj-1][kk+1]) );
+
+                    //Bx split fields
+                    EBx(ii+1 ,jj ,kk+1) =  ( by(jj)*EBx(ii+1 ,jj ,kk+1) + 
+                                             cz(kk)*(EB_WAVE[ii][jj+2][kk+1] - EB_WAVE[ii][jj][kk+1]) );
+
+                    EBx(ii+1 ,jj+1 ,kk) =  ( bz(kk)*EBx(ii+1 ,jj+1 ,kk) - 
+                                             cy(jj)*(EB_WAVE[ii][jj+1][kk+2] - EB_WAVE[ii][jj+1][kk]) );
+
+                    //By split fields
+                    EBy(ii ,jj+1 ,kk+1) =  ( bx(ii)*EBy(ii ,jj+1 ,kk+1) - 
+                                             cz(kk)*(EB_WAVE[ii+2][jj][kk+1] - EB_WAVE[ii][jj][kk+1]) );
+
+                    EBy(ii+1 ,jj+1 ,kk) =  ( bz(kk)*EBy(ii+1 ,jj+1 ,kk) + 
+                                             cx(ii)*(EB_WAVE[ii+1][jj][kk+2] - EB_WAVE[ii+1][jj][kk]) );
+
+                    //Bz split fields
+                    EBz(ii ,jj+1 ,kk+1) =  ( bx(ii)*EBz(ii ,jj+1 ,kk+1) + 
+                                             cy(jj)*(EB_WAVE[ii+2][jj+1][kk] - EB_WAVE[ii][jj+1][kk]) );
+
+                    EBz(ii+1 ,jj ,kk+1) =  ( by(jj)*EBz(ii+1 ,jj ,kk+1) - 
+                                             cx(ii)*(EB_WAVE[ii+1][jj+2][kk] - EB_WAVE[ii+1][jj][kk]) );
+                }
+            }
+        }
+    }
+}
+
+void update_split_PML(  pmlBoundary *PML, gridConfiguration *gridCfg, int pml_size, 
+                        double EB_WAVE[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz]){
+    
+    int ii, jj, kk;
+
+    #pragma omp parallel for collapse(3) default(shared) private(ii,jj,kk) 
+    for ( ii=2 ; ii<gridCfg->Nx-2 ; ii+=2 ) {
+        for ( jj=2 ; jj<gridCfg->Ny-2 ; jj+=2 ) {
+            for ( kk=2 ; kk<gridCfg->Nz-2 ; kk+=2 ) {
+                if(ii <= pml_size + 2 || ii >= gridCfg->Nx - 2 - pml_size ||
+                   jj <= pml_size + 2 || jj >= gridCfg->Ny - 2 - pml_size || 
+                   kk <= pml_size + 2 || kk >= gridCfg->Nz - 2 - pml_size){
+
+                    //Electric field update
+                    EB_WAVE[ii+1][jj][kk] = EBx(ii ,jj+1 ,kk) + EBx(ii ,jj ,kk+1);
+                    EB_WAVE[ii][jj+1][kk] = EBy(ii+1 ,jj ,kk) + EBy(ii ,jj ,kk+1);
+                    EB_WAVE[ii][jj][kk+1] = EBz(ii+1 ,jj ,kk) + EBz(ii ,jj+1 ,kk);
+
+                    //Magnetic field update
+                    EB_WAVE[ii][jj+1][kk+1] = EBx(ii+1 ,jj ,kk+1) + EBx(ii+1 ,jj+1 ,kk);
+                    EB_WAVE[ii+1][jj][kk+1] = EBy(ii ,jj+1 ,kk+1) + EBy(ii+1 ,jj+1 ,kk);
+                    EB_WAVE[ii+1][jj+1][kk] = EBz(ii ,jj+1 ,kk+1) + EBz(ii+1 ,jj ,kk+1);
+                   }
+            }
+        }
+    }
+}
+
+double sigma(int pml_size, double nn, int m, double ds){
+
+    double sig, sig_max, R_0;
+
+    R_0 = pow(10,-6);
+    sig_max = -(m+1)*log( R_0 )/(2*pml_size*ds);
+
+    sig = pow( (nn) /(pml_size), m) * sig_max;
+
+    return sig;  
+}
+
+
+void split_PML_parameter(pmlBoundary *PML, gridConfiguration *gridCfg, int pml_size){
+    
+    int ii, jj, kk, count;
+    double sig, c;
+    
+    count = pml_size;
+    c = gridCfg->dt/gridCfg->dx;
+
+    //#pragma omp parallel  
+    for ( ii=2 ; ii<gridCfg->Nx-2 ; ii+=2 ) {
+        if(ii <= pml_size + 2){
+
+            sig = sigma(pml_size, count - 1, 4, gridCfg->dx);
+            //Electric component
+            bx(ii+1) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cx(ii+1) = c * ( 2/(2 + sig*gridCfg->dt) );
+            
+            sig = sigma(pml_size, count, 4, gridCfg->dx);
+            //Magnetic component
+            bx(ii) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cx(ii) = c * ( 2/(2 + sig*gridCfg->dt) );
+            
+            //printf("Hcx = %f \n", cx(ii) );
+            //printf("Ecx = %f \n", cx(ii+1) );
+
+            count -= 2;
+        }else if( ii >= gridCfg->Nx - 2 - pml_size){
+            count += 2; 
+
+            sig = sigma(pml_size, count - 1, 4, gridCfg->dx);
+            //Electric component
+            bx(ii+1) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cx(ii+1) = c * ( 2/(2 + sig*gridCfg->dt) );
+            
+            sig = sigma(pml_size, count, 4, gridCfg->dx);
+            //Magnetic component
+            bx(ii) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cx(ii) = c * ( 2/(2 + sig*gridCfg->dt) );  
+
+            //printf("Hcx = %f \n", cx(ii) );
+            //printf("Ecx = %f \n", cx(ii+1) );  
+        }
+    }
+
+    for ( jj=2 ; jj<gridCfg->Ny-2 ; jj+=2 ) {
+        if(jj <= pml_size + 2){
+
+            sig = sigma(pml_size, count - 1, 4, gridCfg->dx);
+            //Electric component
+            by(jj+1) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cy(jj+1) = c * ( 2/(2 + sig*gridCfg->dt) );
+
+            sig = sigma(pml_size, count, 4, gridCfg->dx);
+            //Magnetic component
+            by(jj) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cy(jj) = c * ( 2/(2 + sig*gridCfg->dt) );    
+
+            count -= 2;
+        }else if( jj >= gridCfg->Ny - 2 - pml_size){
+            count += 2;
+
+            sig = sigma(pml_size, count - 1, 4, gridCfg->dx);
+            //Electric component
+            by(jj+1) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cy(jj+1) = c * ( 2/(2 + sig*gridCfg->dt) );
+            
+            sig = sigma(pml_size, count, 4, gridCfg->dx);
+            //Magnetic component
+            by(jj) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cy(jj) = c * ( 2/(2 + sig*gridCfg->dt) );    
+        }
+    }
+    
+    for ( kk=2 ; kk<gridCfg->Nz-2 ; kk+=2 ) {
+        if(kk <= pml_size + 2){
+
+            sig = sigma(pml_size, count - 1, 4, gridCfg->dx);
+            //Electric component
+            bz(kk+1) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cz(kk+1) = c * ( 2/(2 + sig*gridCfg->dt) );
+            
+            sig = sigma(pml_size, count, 4, gridCfg->dx);
+            //Magnetic component
+            bz(kk) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cz(kk) = c * ( 2/(2 + sig*gridCfg->dt) );    
+
+            count -= 2;
+
+        }else if( kk >= gridCfg->Nz - 2 - pml_size){
+
+            count += 2; 
+
+            sig = sigma(pml_size, count - 1, 4, gridCfg->dx);
+            //Electric component
+            bz(kk+1) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cz(kk+1) = c * ( 2/(2 + sig*gridCfg->dt) );
+            
+            sig = sigma(pml_size, count, 4, gridCfg->dx);
+            //Magnetic component
+            bz(kk) = (2 - sig*gridCfg->dt)/(2 + sig*gridCfg->dt);
+            cz(kk) = c * ( 2/(2 + sig*gridCfg->dt) );    
+        }
+    }
+}
+
+
+/*Apply boundary conditions to simulation*/
+void setBoundary(   gridConfiguration *gridCfg,  
+                    pmlBoundary *PML, 
+                    namePath *pathFile,
+                    abcBoundary *ABC){
+
+    int pml_size;
+    pml_size = gridCfg->d_absorb;
+
+    if(pathFile->boundary == 1){ //normal absorbing boundary condition
+        printf("Absorbing Boundary conditions applied. \n");
+        ABC->eco = 10./(double)(gridCfg->period);
+    }
+
+    if(pathFile->boundary == 2){
+        //initialize_split_PML(PML, gridCfg);
+    }    
+
+    if(pathFile->boundary == 3){
+        initialize_split_PML(PML, gridCfg, pml_size);
+    }
+
+}
+
+void computeBoundary(   gridConfiguration *gridCfg,  
+                        pmlBoundary *PML, 
+                        namePath *pathFile, 
+                        abcBoundary *ABC,
+                        double EB_WAVE[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz], int t_int,
+                        double EB_WAVE_ref[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz_ref]){
+
+    int pml_size;
+    pml_size = gridCfg->d_absorb;
+
+    if(pathFile->boundary == 1){ //normal absorbing boundary condition
+        
+        /*printf("No problem here \n");
+        apply_absorber(     &gridCfg, eco, EB_WAVE );
+        printf("No problem here \n");
+        apply_absorber_ref( &gridCfg, eco, EB_WAVE_ref );*/
+
+    }
+
+    if(pathFile->boundary == 2){
+        
+    }    
+
+    if(pathFile->boundary == 3){
+        //initialize_split_PML(PML, gridCfg);
+        apply_split_PML( PML, gridCfg, pml_size, EB_WAVE);
+        update_split_PML( PML, gridCfg, pml_size, EB_WAVE);
+        
+    }
+
+}

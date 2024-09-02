@@ -6,6 +6,8 @@
 #include <string.h>
 
 #include "focal-struct.h"
+#include "alloc-memory.h"
+#include "macros-boundary.h"
 
 int set_densityInAbsorber_v2( gridConfiguration *gridCfg,
                               char absorber[], 
@@ -57,5 +59,20 @@ int abc_Mur_1st_ref( gridConfiguration *gridCfg,
                      double E_old_xdir[8][gridCfg->Ny][gridCfg->Nz_ref], 
                      double E_old_ydir[gridCfg->Nx][8][gridCfg->Nz_ref], 
                      double E_old_zdir[gridCfg->Nx][gridCfg->Ny][8] );
+
+void initialize_split_PML(pmlBoundary *PML, gridConfiguration *gridCfg, int pml_size);
+
+void apply_split_PML(pmlBoundary *PML, gridConfiguration *gridCfg, int pml_size, double EB_WAVE[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz]);
+
+void split_PML_parameter(pmlBoundary *PML, gridConfiguration *gridCfg, int pml_size);
+
+void setBoundary(gridConfiguration *gridCfg, pmlBoundary *PML, namePath *pathFile, abcBoundary *ABC);
+
+void computeBoundary(   gridConfiguration *gridCfg,  
+                        pmlBoundary *PML, 
+                        namePath *pathFile,
+                        abcBoundary *ABC,
+                        double EB_WAVE[gridCfg->Nx][gridCfg->Ny][gridCfg->Nz], int t_int,
+                        double EB_WAVE_ref [gridCfg->Nx][gridCfg->Ny][gridCfg->Nz]);
 
 #endif

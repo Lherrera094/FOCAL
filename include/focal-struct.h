@@ -11,7 +11,8 @@ typedef struct gridConfiguration {
         ne_profile, B0_profile;
     double
         period,
-        dx,dt;
+        dx,dt,
+        ne_max, B0_value;
 } gridConfiguration;
 typedef struct beamConfiguration {
     int
@@ -34,6 +35,14 @@ typedef struct antennaDetector{
         detAnt_03_zpos,detAnt_04_zpos,
         detAnt_01_ypos;
 } antennaDetector;
+typedef struct abcBoundary{
+    double eco;
+} abcBoundary;
+typedef struct pmlBoundary{
+    double  *EBx, *EBy, *EBz, *EB,
+            *bx, *by, *bz,
+            *cx, *cy, *cz;
+} pmlBoundary;
 
 
 #endif
